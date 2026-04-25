@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorBackground" format="color" />
+    <attr name="colorSurface" format="color" />
+    <attr name="colorText" format="color" />
+    <attr name="colorHint" format="color" />
+    <attr name="colorDivider" format="color" />
+    <attr name="colorEmptyTitle" format="color" />
+    <attr name="colorCard" format="color" />
+    <attr name="colorInput" format="color" />
+</resources>
