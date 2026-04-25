@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="colorBackground" format="color" />
-    <attr name="colorSurface" format="color" />
-    <attr name="colorText" format="color" />
-    <attr name="colorHint" format="color" />
-    <attr name="colorDivider" format="color" />
-    <attr name="colorEmptyTitle" format="color" />
-    <attr name="colorCard" format="color" />
-    <attr name="colorInput" format="color" />
+    <attr name="todoBgColor" format="color" />
+    <attr name="todoSurfaceColor" format="color" />
+    <attr name="todoTextColor" format="color" />
+    <attr name="todoHintColor" format="color" />
+    <attr name="todoDividerColor" format="color" />
+    <attr name="todoEmptyTitleColor" format="color" />
+    <attr name="todoCardColor" format="color" />
+    <attr name="todoInputColor" format="color" />
 </resources>

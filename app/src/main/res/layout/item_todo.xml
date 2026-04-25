@@ -40,7 +40,7 @@
                 android:id="@+id/editTodoText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorText"
+                android:textColor="?attr/todoTextColor"
                 android:textSize="15sp"
                 android:fontFamily="sans-serif"
                 android:background="@null"

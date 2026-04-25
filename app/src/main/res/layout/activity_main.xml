@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorBackground">
+    android:background="?attr/todoBgColor">
 
     <!-- Header -->
     <LinearLayout
@@ -67,7 +67,7 @@
         android:id="@+id/divider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="?attr/colorDivider"
+        android:background="?attr/todoDividerColor"
         app:layout_constraintTop_toBottomOf="@id/header"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -92,8 +92,8 @@
             android:layout_height="52dp"
             android:layout_weight="1"
             android:hint="Was steht an?"
-            android:hintTextColor="?attr/colorHint"
-            android:textColor="?attr/colorText"
+            android:hintTextColor="?attr/todoHintColor"
+            android:textColor="?attr/todoTextColor"
             android:textSize="16sp"
             android:fontFamily="sans-serif"
             android:background="@drawable/input_bg"
@@ -131,7 +131,7 @@
             android:layout_height="wrap_content"
             android:text="✦"
             android:textSize="40sp"
-            android:textColor="?attr/colorText"
+            android:textColor="?attr/todoTextColor"
             android:layout_marginBottom="16dp" />
 
         <TextView
@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:text="Alles frei. Was kommt als nächstes?"
             android:textSize="18sp"
-            android:textColor="?attr/colorEmptyTitle"
+            android:textColor="?attr/todoEmptyTitleColor"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
@@ -151,7 +151,7 @@
             android:layout_height="wrap_content"
             android:text="Gib eine Aufgabe oben ein."
             android:textSize="14sp"
-            android:textColor="?attr/colorHint"
+            android:textColor="?attr/todoHintColor"
             android:gravity="center" />
 
     </LinearLayout>
