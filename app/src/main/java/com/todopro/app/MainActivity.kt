@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -41,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var konfettiView: KonfettiView
     private lateinit var tvSnackbar: TextView
     private lateinit var snackbarLayout: LinearLayout
+    private lateinit var header: LinearLayout
+    private lateinit var inputRow: LinearLayout
 
     private val todos = mutableListOf<TodoItem>()
     private var isDarkMode = true
@@ -62,9 +65,13 @@ class MainActivity : AppCompatActivity() {
         loadTodos()
         setupRecyclerView()
         setupListeners()
+        setupButtonAnimations()
         requestNotificationPermission()
         checkExactAlarmPermission()
         updateEmptyView()
+
+        // Header Slide-Down Animation beim Start
+        animateHeaderIn()
     }
 
     private fun applyTheme() {
@@ -86,6 +93,50 @@ class MainActivity : AppCompatActivity() {
         konfettiView = findViewById(R.id.konfettiView)
         tvSnackbar = findViewById(R.id.tvSnackbar)
         snackbarLayout = findViewById(R.id.snackbarLayout)
+        header = findViewById(R.id.header)
+        inputRow = findViewById(R.id.inputRow)
+    }
+
+    private fun animateHeaderIn() {
+        // Header von oben reinschieben
+        header.translationY = -100f
+        header.alpha = 0f
+        header.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(400)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
+
+        // Input Row mit Verzögerung
+        inputRow.alpha = 0f
+        inputRow.translationY = 30f
+        inputRow.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(400)
+            .setStartDelay(200)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
+    }
+
+    private fun setupButtonAnimations() {
+        // Scale-Animation für alle Buttons
+        listOf(btnAdd, btnTheme, btnNotifications, btnHelp).forEach { btn ->
+            btn.setOnTouchListener { v, event ->
+                when (event.action) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        v.animate().scaleX(0.88f).scaleY(0.88f).setDuration(100).start()
+                    }
+                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(150)
+                            .setInterpolator(android.view.animation.OvershootInterpolator())
+                            .start()
+                    }
+                }
+                false
+            }
+        }
     }
 
     private fun loadTodos() {
@@ -112,6 +163,13 @@ class MainActivity : AppCompatActivity() {
         )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+
+        // Item Animator für smooth Animationen
+        recyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator().apply {
+            addDuration = 300
+            removeDuration = 250
+            moveDuration = 200
+        }
     }
 
     private fun setupListeners() {
@@ -141,7 +199,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun addTodo() {
         val text = editInput.text.toString().trim()
-        if (text.isEmpty()) return
+        if (text.isEmpty()) {
+            // Shake-Animation wenn leer
+            editInput.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake_input))
+            return
+        }
 
         val todo = TodoItem(
             text = text,
@@ -149,10 +211,17 @@ class MainActivity : AppCompatActivity() {
         )
         todos.add(0, todo)
         sortTodos()
-        adapter.notifyDataSetChanged()
+        val insertPos = todos.indexOf(todo)
+        adapter.notifyItemInserted(insertPos)
         saveTodos()
         editInput.setText("")
         updateEmptyView()
+
+        // Add-Button kurz aufleuchten
+        btnAdd.animate().scaleX(1.15f).scaleY(1.15f).setDuration(100).withEndAction {
+            btnAdd.animate().scaleX(1f).scaleY(1f).setDuration(150)
+                .setInterpolator(android.view.animation.OvershootInterpolator()).start()
+        }.start()
     }
 
     private fun deleteTodo(todo: TodoItem) {
@@ -218,12 +287,20 @@ class MainActivity : AppCompatActivity() {
     private fun showSnackbar(message: String) {
         tvSnackbar.text = message
         snackbarLayout.visibility = View.VISIBLE
-        snackbarLayout.alpha = 1f
+        snackbarLayout.alpha = 0f
+        snackbarLayout.translationY = 40f
+        snackbarLayout.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(300)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
 
         snackbarRunnable?.let { snackbarLayout.removeCallbacks(it) }
         snackbarRunnable = Runnable {
-            snackbarLayout.animate().alpha(0f).setDuration(300).withEndAction {
+            snackbarLayout.animate().alpha(0f).translationY(20f).setDuration(300).withEndAction {
                 snackbarLayout.visibility = View.GONE
+                snackbarLayout.translationY = 0f
             }.start()
         }
         snackbarLayout.postDelayed(snackbarRunnable!!, 3000)
@@ -257,7 +334,6 @@ class MainActivity : AppCompatActivity() {
             tvCurrentReminder.visibility = View.VISIBLE
         }
 
-        // Datum/Zeit vorbelegen
         val cal = Calendar.getInstance()
         todo.reminderTime?.let { cal.timeInMillis = it }
         editDate.setText(sdfDate.format(cal.time))
@@ -278,15 +354,9 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
-        btn15min.setOnClickListener {
-            setReminder(System.currentTimeMillis() + 15 * 60 * 1000)
-        }
-        btn30min.setOnClickListener {
-            setReminder(System.currentTimeMillis() + 30 * 60 * 1000)
-        }
-        btn1hour.setOnClickListener {
-            setReminder(System.currentTimeMillis() + 60 * 60 * 1000)
-        }
+        btn15min.setOnClickListener { setReminder(System.currentTimeMillis() + 15 * 60 * 1000) }
+        btn30min.setOnClickListener { setReminder(System.currentTimeMillis() + 30 * 60 * 1000) }
+        btn1hour.setOnClickListener { setReminder(System.currentTimeMillis() + 60 * 60 * 1000) }
         btnTomorrow.setOnClickListener {
             val tomorrow = Calendar.getInstance().apply {
                 add(Calendar.DAY_OF_YEAR, 1)
@@ -330,7 +400,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnClose.setOnClickListener { dialog.dismiss() }
-
         dialog.show()
     }
 
@@ -383,6 +452,8 @@ class MainActivity : AppCompatActivity() {
     private fun updateEmptyView() {
         if (todos.isEmpty()) {
             emptyView.visibility = View.VISIBLE
+            emptyView.alpha = 0f
+            emptyView.animate().alpha(1f).setDuration(400).start()
             recyclerView.visibility = View.GONE
         } else {
             emptyView.visibility = View.GONE
