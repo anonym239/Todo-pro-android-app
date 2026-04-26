@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="110dp"
+    android:height="110dp"
+    android:viewportWidth="110"
+    android:viewportHeight="110">
+
+    <!-- Roter abgerundeter Hintergrund -->
+    <path
+        android:fillColor="#E8194B"
+        android:pathData="M20,0 L90,0 Q110,0 110,20 L110,90 Q110,110 90,110 L20,110 Q0,110 0,90 L0,20 Q0,0 20,0 Z" />
+
+    <!-- Weißes Häkchen (dick, geschwungen wie im Bild) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,58 C28,54 33,52 37,56 L48,68 L73,36 C77,31 83,30 87,34 C91,38 90,44 86,48 L52,82 C50,84 47,85 44,84 C41,83 39,81 38,79 L24,63 C22,60 23,61 26,58 Z" />
+
+</vector>

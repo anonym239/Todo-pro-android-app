@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/dialog_bg"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TODOPRO –"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-black" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Anleitung"
+                    android:textColor="@color/neon_yellow"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-black" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/btn_close_bg"
+                android:src="@drawable/ic_close"
+                android:contentDescription="Schließen" />
+
+        </LinearLayout>
+
+        <!-- Priorität -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:background="@drawable/help_item_bg"
+            android:padding="16dp" android:layout_marginBottom="10dp">
+            <TextView android:layout_width="40dp" android:layout_height="40dp"
+                android:text="🚨" android:textSize="24sp" android:gravity="center" android:layout_marginEnd="14dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Priorität" android:textColor="@color/neon_yellow"
+                    android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Beginne mit ! für wichtige Aufgaben – sie werden oben angeheftet."
+                    android:textColor="#AAAAAA" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Text bearbeiten -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:background="@drawable/help_item_bg"
+            android:padding="16dp" android:layout_marginBottom="10dp">
+            <TextView android:layout_width="40dp" android:layout_height="40dp"
+                android:text="✏️" android:textSize="24sp" android:gravity="center" android:layout_marginEnd="14dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Text bearbeiten" android:textColor="@color/neon_yellow"
+                    android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Klicke direkt in eine Aufgabe, um den Text zu ändern. Wird automatisch gespeichert."
+                    android:textColor="#AAAAAA" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Erinnerung -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:background="@drawable/help_item_bg"
+            android:padding="16dp" android:layout_marginBottom="10dp">
+            <TextView android:layout_width="40dp" android:layout_height="40dp"
+                android:text="⏰" android:textSize="24sp" android:gravity="center" android:layout_marginEnd="14dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Erinnerung" android:textColor="@color/neon_yellow"
+                    android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Klicke auf 🔔 neben dem Buch-Symbol einer Aufgabe, um eine Benachrichtigung zu planen – auch wenn die App geschlossen ist."
+                    android:textColor="#AAAAAA" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Abschließen -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:background="@drawable/help_item_bg"
+            android:padding="16dp" android:layout_marginBottom="10dp">
+            <TextView android:layout_width="40dp" android:layout_height="40dp"
+                android:text="✅" android:textSize="24sp" android:gravity="center" android:layout_marginEnd="14dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Abschließen" android:textColor="@color/neon_yellow"
+                    android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Checkbox rechts anklicken – Aufgabe wird gelöscht. Alles erledigt? Konfetti!"
+                    android:textColor="#AAAAAA" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Löschen -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:background="@drawable/help_item_bg"
+            android:padding="16dp" android:layout_marginBottom="10dp">
+            <TextView android:layout_width="40dp" android:layout_height="40dp"
+                android:text="🗑️" android:textSize="24sp" android:gravity="center" android:layout_marginEnd="14dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Löschen" android:textColor="@color/neon_yellow"
+                    android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Das × anklicken, um eine Aufgabe sofort zu entfernen."
+                    android:textColor="#AAAAAA" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Autosave -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:background="@drawable/help_item_bg"
+            android:padding="16dp" android:layout_marginBottom="10dp">
+            <TextView android:layout_width="40dp" android:layout_height="40dp"
+                android:text="💾" android:textSize="24sp" android:gravity="center" android:layout_marginEnd="14dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Autosave" android:textColor="@color/neon_yellow"
+                    android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Deine Liste wird automatisch lokal auf dem Gerät gespeichert."
+                    android:textColor="#AAAAAA" android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

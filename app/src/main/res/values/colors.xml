@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="neon_yellow">#CCFF00</color>
+    <color name="neon_green">#00FF88</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Dark Theme -->
+    <color name="dark_bg">#0A0A0A</color>
+    <color name="dark_surface">#1A1A1A</color>
+    <color name="dark_card">#1E1E1E</color>
+    <color name="dark_input">#1A1A1A</color>
+    <color name="dark_divider">#2A2A2A</color>
+    <color name="dark_text">#FFFFFF</color>
+    <color name="dark_hint">#666666</color>
+
+    <!-- Light Theme -->
+    <color name="light_bg">#EEECE8</color>
+    <color name="light_surface">#FFFFFF</color>
+    <color name="light_card">#FFFFFF</color>
+    <color name="light_input">#FFFFFF</color>
+    <color name="light_divider">#DDDDDD</color>
+    <color name="light_text">#111111</color>
+    <color name="light_hint">#999999</color>
+
+    <!-- Accent -->
+    <color name="priority_red">#FF4444</color>
+    <color name="complete_green">#4CAF50</color>
+
+    <!-- Splash -->
+    <color name="splash_bg">#0A0A0A</color>
+    <color name="splash_red">#E8194B</color>
+</resources>

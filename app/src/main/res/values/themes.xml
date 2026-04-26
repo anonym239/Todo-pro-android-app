@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Dark Theme -->
+    <style name="Theme.TodoPro.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/neon_yellow</item>
+        <item name="colorPrimaryVariant">@color/neon_yellow</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="android:statusBarColor">@color/dark_bg</item>
+        <item name="android:navigationBarColor">@color/dark_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/dark_bg</item>
+        <!-- Custom attrs -->
+        <item name="todoBgColor">@color/dark_bg</item>
+        <item name="todoSurfaceColor">@color/dark_surface</item>
+        <item name="todoTextColor">@color/dark_text</item>
+        <item name="todoHintColor">@color/dark_hint</item>
+        <item name="todoDividerColor">@color/dark_divider</item>
+        <item name="todoEmptyTitleColor">@color/neon_yellow</item>
+        <item name="todoCardColor">@color/dark_card</item>
+        <item name="todoInputColor">@color/dark_input</item>
+    </style>
+
+    <!-- Light Theme -->
+    <style name="Theme.TodoPro.Light" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryVariant">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:statusBarColor">@color/light_bg</item>
+        <item name="android:navigationBarColor">@color/light_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/light_bg</item>
+        <!-- Custom attrs -->
+        <item name="todoBgColor">@color/light_bg</item>
+        <item name="todoSurfaceColor">@color/light_surface</item>
+        <item name="todoTextColor">@color/light_text</item>
+        <item name="todoHintColor">@color/light_hint</item>
+        <item name="todoDividerColor">@color/light_divider</item>
+        <item name="todoEmptyTitleColor">@color/light_text</item>
+        <item name="todoCardColor">@color/light_card</item>
+        <item name="todoInputColor">@color/light_input</item>
+    </style>
+
+    <!-- Dialog Theme -->
+    <style name="ReminderDialogTheme" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <!-- Splash Theme -->
+    <style name="Theme.TodoPro.Splash" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">@color/splash_bg</item>
+        <item name="android:statusBarColor">@color/splash_bg</item>
+        <item name="android:navigationBarColor">@color/splash_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+</resources>

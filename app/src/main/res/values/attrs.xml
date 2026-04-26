@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="todoBgColor" format="color" />
+    <attr name="todoSurfaceColor" format="color" />
+    <attr name="todoTextColor" format="color" />
+    <attr name="todoHintColor" format="color" />
+    <attr name="todoDividerColor" format="color" />
+    <attr name="todoEmptyTitleColor" format="color" />
+    <attr name="todoCardColor" format="color" />
+    <attr name="todoInputColor" format="color" />
+</resources>
