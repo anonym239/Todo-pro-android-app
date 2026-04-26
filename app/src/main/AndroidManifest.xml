@@ -3,17 +3,19 @@
 
     <!-- Benachrichtigungen -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Exakter Alarm (für zuverlässige Timer auch im Hintergrund) -->
+    <!-- Exakter Alarm -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-    <!-- Wakelock damit Benachrichtigung auch bei gesperrtem Bildschirm kommt -->
+    <!-- Wakelock -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Autostart nach Neustart -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Internet für Update-Check -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Download-Manager für APK-Download -->
+    <!-- APK-Installation -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Haptic Feedback -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -23,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoPro.Dark">
 
-        <!-- Splash Screen - startet zuerst -->
+        <!-- Splash Screen -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -38,6 +40,12 @@
         <!-- Haupt-Activity -->
         <activity
             android:name=".MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Statistik-Activity -->
+        <activity
+            android:name=".StatsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
@@ -62,7 +70,13 @@
             </intent-filter>
         </receiver>
 
-        <!-- FileProvider für APK-Installation (Update) -->
+        <!-- BroadcastReceiver für tägliche Zusammenfassung -->
+        <receiver
+            android:name=".DailySummaryReceiver"
+            android:exported="false"
+            android:enabled="true" />
+
+        <!-- FileProvider für APK-Installation -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

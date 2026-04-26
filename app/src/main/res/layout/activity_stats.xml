@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/mainBackground"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📊 Statistiken"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="?attr/headerTextColor"
+                android:fontFamily="sans-serif-medium" />
+
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/btn_icon_bg"
+                android:src="@drawable/ic_close"
+                android:contentDescription="Schließen"
+                android:padding="10dp" />
+
+        </LinearLayout>
+
+        <!-- Streak Card -->
+        <LinearLayout
+            android:id="@+id/cardStreak"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/todo_item_bg"
+            android:padding="28dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvStreakEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="😴"
+                android:textSize="52sp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvStreak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="56sp"
+                android:textStyle="bold"
+                android:textColor="@color/neon_green"
+                android:fontFamily="sans-serif-black" />
+
+            <TextView
+                android:id="@+id/tvStreakLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tage Streak"
+                android:textSize="16sp"
+                android:textColor="?attr/todoHintColor"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <!-- Stats Grid -->
+        <LinearLayout
+            android:id="@+id/cardStats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <!-- Heute erledigt -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/todo_item_bg"
+                android:padding="20dp"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✅"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:id="@+id/tvCompletedToday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neon_green"
+                    android:fontFamily="sans-serif-black"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Heute"
+                    android:textSize="12sp"
+                    android:textColor="?attr/todoHintColor"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <!-- Gesamt erledigt -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/todo_item_bg"
+                android:padding="20dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏆"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:id="@+id/tvTotalCompleted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neon_yellow"
+                    android:fontFamily="sans-serif-black"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gesamt"
+                    android:textSize="12sp"
+                    android:textColor="?attr/todoHintColor"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <!-- Offen -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/todo_item_bg"
+                android:padding="20dp"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📌"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:id="@+id/tvOpenTodos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/neon_blue"
+                    android:fontFamily="sans-serif-black"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Offen"
+                    android:textSize="12sp"
+                    android:textColor="?attr/todoHintColor"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Zuletzt erledigt -->
+        <LinearLayout
+            android:id="@+id/cardCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/todo_item_bg"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zuletzt erledigt"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?attr/headerTextColor"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvCompletedList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="?attr/todoTextColor"
+                android:lineSpacingMultiplier="1.3"
+                android:text="Noch keine erledigten Aufgaben" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
