@@ -21,6 +21,8 @@ object UpdateChecker {
     private const val GITHUB_USER = "anonym239"
     private const val GITHUB_REPO = "Todo-pro-android-app"
     private const val TAG = "UpdateChecker"
+    private const val PREFS_NAME = "todopro_prefs"
+    private const val KEY_SKIPPED_VERSION = "skipped_update_version"
 
     // Prüft ob ein Update verfügbar ist (läuft im Hintergrund-Thread)
     fun checkForUpdate(context: Context, currentVersion: String) {
@@ -57,10 +59,14 @@ object UpdateChecker {
 
                     val currentClean = currentVersion.trimStart('v')
 
-                    Log.d(TAG, "Current: $currentClean | Latest: $latestTag")
+                    // Bereits gesehene/installierte Version aus Prefs lesen
+                    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    val skippedVersion = prefs.getString(KEY_SKIPPED_VERSION, "") ?: ""
 
-                    if (isNewerVersion(latestTag, currentClean)) {
-                        // Auf dem UI-Thread den Dialog zeigen
+                    Log.d(TAG, "Current: $currentClean | Latest: $latestTag | Skipped: $skippedVersion")
+
+                    // Nur zeigen wenn: neuere Version UND nicht bereits für diese Version gefragt
+                    if (isNewerVersion(latestTag, currentClean) && latestTag != skippedVersion) {
                         (context as? androidx.appcompat.app.AppCompatActivity)?.runOnUiThread {
                             showUpdateDialog(context, releaseName, latestTag, apkDownloadUrl, releaseUrl)
                         }
@@ -104,10 +110,11 @@ object UpdateChecker {
             .setTitle("🔄 Update verfügbar!")
             .setMessage("Eine neue Version ist verfügbar:\n\n📦 $releaseName\n\nMöchtest du jetzt aktualisieren?")
             .setPositiveButton("⬇️ Jetzt installieren") { _, _ ->
+                // Version als "gesehen" markieren damit Dialog nicht nochmal kommt
+                markVersionAsSeen(context, version)
                 if (apkUrl != null) {
                     downloadAndInstallApk(activity, apkUrl, version)
                 } else {
-                    // Fallback: Browser öffnen
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(releaseUrl))
                     activity.startActivity(intent)
                 }
@@ -115,6 +122,14 @@ object UpdateChecker {
             .setNegativeButton("Später", null)
             .setCancelable(true)
             .show()
+    }
+
+    // Merkt sich die Version damit der Dialog nicht nochmal erscheint
+    private fun markVersionAsSeen(context: Context, version: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_SKIPPED_VERSION, version)
+            .apply()
     }
 
     private fun downloadAndInstallApk(context: Context, apkUrl: String, version: String) {
@@ -184,8 +199,19 @@ object UpdateChecker {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
             context.startActivity(intent)
+
         } catch (e: Exception) {
             Log.e(TAG, "Installation fehlgeschlagen: ${e.message}")
         }
+    }
+
+    // Wird nach erfolgreicher Installation aufgerufen - startet App neu
+    // (Todos bleiben erhalten da sie in SharedPreferences gespeichert sind)
+    fun restartApp(context: Context) {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+        // Aktuellen Prozess beenden
+        android.os.Process.killProcess(android.os.Process.myPid())
     }
 }

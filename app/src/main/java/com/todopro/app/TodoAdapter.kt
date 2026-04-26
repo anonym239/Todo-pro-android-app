@@ -30,6 +30,7 @@ class TodoAdapter(
         val tvReminderTime: TextView = view.findViewById(R.id.tvReminderTime)
         val tvCreatedDate: TextView = view.findViewById(R.id.tvCreatedDate)
         val cardContent: LinearLayout = view.findViewById(R.id.cardContent)
+        val priorityBar: View = view.findViewById(R.id.priorityBar)
         val root: View = view.findViewById(R.id.todoItemRoot)
     }
 
@@ -57,11 +58,11 @@ class TodoAdapter(
         holder.editText.setText(displayText)
         holder.editText.setSelection(holder.editText.text.length)
 
-        // Prioritäts-Hintergrund: roter linker Rand direkt an der Karte
+        // Prioritäts-Streifen: roter Balken links INNERHALB der Karte
         if (todo.isPriority) {
-            holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg_priority)
+            holder.priorityBar.visibility = View.VISIBLE
         } else {
-            holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg)
+            holder.priorityBar.visibility = View.GONE
         }
 
         // Reminder-Zeit anzeigen
@@ -80,30 +81,27 @@ class TodoAdapter(
         holder.tvCreatedDate.text = sdfDate.format(Date(todo.createdAt))
 
         // TextWatcher für Auto-Save
-        // Wenn User tippt: ! am Anfang → isPriority setzen, aber ! nicht im Text speichern
         val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val typed = s?.toString() ?: ""
                 if (typed.startsWith("!")) {
-                    // ! am Anfang → Prio setzen, aber ! aus Text entfernen
+                    // ! am Anfang → Prio setzen, ! aus Anzeige entfernen
                     val cleanText = typed.removePrefix("!").trimStart()
                     todo.isPriority = true
-                    todo.text = "!$cleanText" // intern mit ! speichern für Sortierung
+                    todo.text = "!$cleanText"
                     onTextChanged(todo, "!$cleanText")
-                    // Cursor-Position nach dem Entfernen des ! korrigieren
                     holder.editText.removeTextChangedListener(this)
                     holder.editText.setText(cleanText)
                     holder.editText.setSelection(cleanText.length)
                     holder.editText.addTextChangedListener(this)
-                    // Hintergrund sofort aktualisieren
-                    holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg_priority)
+                    holder.priorityBar.visibility = View.VISIBLE
                 } else {
                     todo.isPriority = false
                     todo.text = typed
                     onTextChanged(todo, typed)
-                    holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg)
+                    holder.priorityBar.visibility = View.GONE
                 }
             }
         }
@@ -115,24 +113,17 @@ class TodoAdapter(
             holder.btnComplete.isEnabled = false
 
             holder.btnComplete.animate()
-                .scaleX(1.3f)
-                .scaleY(1.3f)
-                .setDuration(120)
+                .scaleX(1.3f).scaleY(1.3f).setDuration(120)
                 .withEndAction {
                     holder.btnComplete.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(80)
+                        .scaleX(1f).scaleY(1f).setDuration(80)
                         .withEndAction {
                             val slideRight = AnimationUtils.loadAnimation(
-                                holder.itemView.context,
-                                R.anim.slide_right_out
+                                holder.itemView.context, R.anim.slide_right_out
                             )
                             slideRight.fillAfter = true
                             holder.cardContent.startAnimation(slideRight)
-                            holder.cardContent.postDelayed({
-                                onComplete(todo)
-                            }, 360)
+                            holder.cardContent.postDelayed({ onComplete(todo) }, 360)
                         }.start()
                 }.start()
         }
