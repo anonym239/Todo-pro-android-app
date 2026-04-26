@@ -81,6 +81,8 @@ class MainActivity : AppCompatActivity() {
     private var isDarkMode = true
     private var snackbarRunnable: Runnable? = null
     private var lastDeletedTodo: TodoItem? = null
+    private val goalHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var goalHideRunnable: Runnable? = null
 
     companion object {
         private const val NOTIF_PERMISSION_REQUEST = 1001
@@ -841,22 +843,37 @@ class MainActivity : AppCompatActivity() {
                 .setInterpolator(OvershootInterpolator(1.2f)).start()
         }
 
-        // Ziel erreicht: Snackbar + Karte nach kurzer Zeit ausblenden
-        if (isReached && !TodoStorage.isGoalReachedToday(this)) {
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                showSnackbar("🏆 Tagesziel erreicht! Fantastisch!")
-                launchKonfetti()
-            }, 600)
-            // Karte nach 3 Sekunden sanft ausblenden
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                goalCard.animate()
-                    .alpha(0f)
-                    .translationY(-16f)
-                    .setDuration(400)
-                    .setInterpolator(DecelerateInterpolator())
-                    .withEndAction { goalCard.visibility = View.GONE; goalCard.translationY = 0f; goalCard.alpha = 1f }
-                    .start()
-            }, 3000)
+        // Ziel erreicht: Karte nach 3 Sekunden ausblenden
+        if (isReached) {
+            // Snackbar + Konfetti nur beim ersten Mal
+            if (!TodoStorage.isGoalReachedToday(this)) {
+                goalHandler.postDelayed({
+                    showSnackbar("🏆 Tagesziel erreicht! Fantastisch!")
+                    launchKonfetti()
+                }, 600)
+            }
+            // Alten Runnable entfernen und neuen starten
+            goalHideRunnable?.let { goalHandler.removeCallbacks(it) }
+            goalHideRunnable = Runnable {
+                if (goalCard.visibility == View.VISIBLE) {
+                    goalCard.animate()
+                        .alpha(0f)
+                        .translationY(-16f)
+                        .setDuration(400)
+                        .setInterpolator(DecelerateInterpolator())
+                        .withEndAction {
+                            goalCard.visibility = View.GONE
+                            goalCard.translationY = 0f
+                            goalCard.alpha = 1f
+                        }
+                        .start()
+                }
+            }
+            goalHandler.postDelayed(goalHideRunnable!!, 3000)
+        } else {
+            // Ziel noch nicht erreicht: evtl. laufenden Hide-Timer abbrechen
+            goalHideRunnable?.let { goalHandler.removeCallbacks(it) }
+            goalHideRunnable = null
         }
     }
 
