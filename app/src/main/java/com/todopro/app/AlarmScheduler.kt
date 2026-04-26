@@ -18,6 +18,7 @@ object AlarmScheduler {
             action = "com.todopro.app.ALARM_TRIGGER"
             putExtra(AlarmReceiver.EXTRA_TODO_ID, todo.id)
             putExtra(AlarmReceiver.EXTRA_TODO_TEXT, todo.text)
+            putExtra(AlarmReceiver.EXTRA_IS_PRIORITY, todo.isPriority)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(

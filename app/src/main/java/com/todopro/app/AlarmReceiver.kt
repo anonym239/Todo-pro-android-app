@@ -17,11 +17,13 @@ class AlarmReceiver : BroadcastReceiver() {
         const val CHANNEL_ID = "todopro_reminders"
         const val EXTRA_TODO_ID = "todo_id"
         const val EXTRA_TODO_TEXT = "todo_text"
+        const val EXTRA_IS_PRIORITY = "is_priority"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         val todoId = intent.getStringExtra(EXTRA_TODO_ID) ?: return
         val todoText = intent.getStringExtra(EXTRA_TODO_TEXT) ?: "Erinnerung"
+        val isPriority = intent.getBooleanExtra(EXTRA_IS_PRIORITY, false)
 
         if (!TodoStorage.isNotificationsEnabled(context)) return
 
@@ -38,11 +40,18 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
+        // Text bereinigen: ! am Anfang entfernen für Anzeige
+        val cleanText = if (todoText.startsWith("!")) todoText.removePrefix("!").trimStart() else todoText
+
+        // Für Prio-Todos: 🚨Text🚨 in der Benachrichtigung
+        val notificationText = if (isPriority) "🚨$cleanText🚨" else cleanText
+        val notificationTitle = if (isPriority) "🚨 Wichtige Erinnerung!" else "⏰ TodoPro Erinnerung"
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("⏰ TodoPro Erinnerung")
-            .setContentText(todoText)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(todoText))
+            .setContentTitle(notificationTitle)
+            .setContentText(notificationText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setSound(soundUri)

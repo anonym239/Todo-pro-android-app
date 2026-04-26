@@ -29,7 +29,6 @@ class TodoAdapter(
         val btnReminder: ImageButton = view.findViewById(R.id.btnReminder)
         val tvReminderTime: TextView = view.findViewById(R.id.tvReminderTime)
         val tvCreatedDate: TextView = view.findViewById(R.id.tvCreatedDate)
-        val priorityIndicator: View = view.findViewById(R.id.priorityIndicator)
         val cardContent: LinearLayout = view.findViewById(R.id.cardContent)
         val root: View = view.findViewById(R.id.todoItemRoot)
     }
@@ -48,12 +47,22 @@ class TodoAdapter(
         holder.itemView.startAnimation(slideIn)
 
         // Text setzen ohne TextWatcher auszulösen
+        // ! am Anfang wird NICHT angezeigt - nur der reine Text
         holder.editText.removeTextChangedListener(holder.editText.tag as? TextWatcher)
-        holder.editText.setText(todo.text)
+        val displayText = if (todo.isPriority && todo.text.startsWith("!")) {
+            todo.text.removePrefix("!").trimStart()
+        } else {
+            todo.text
+        }
+        holder.editText.setText(displayText)
         holder.editText.setSelection(holder.editText.text.length)
 
-        // Priorität anzeigen (! am Anfang)
-        holder.priorityIndicator.visibility = if (todo.isPriority) View.VISIBLE else View.GONE
+        // Prioritäts-Hintergrund: roter linker Rand direkt an der Karte
+        if (todo.isPriority) {
+            holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg_priority)
+        } else {
+            holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg)
+        }
 
         // Reminder-Zeit anzeigen
         if (todo.reminderTime != null) {
@@ -66,17 +75,36 @@ class TodoAdapter(
             holder.btnReminder.setImageResource(R.drawable.ic_bell)
         }
 
-        // Erstellungsdatum anzeigen (z.B. 24.4.26)
+        // Erstellungsdatum anzeigen (z.B. 26.4.26)
         val sdfDate = SimpleDateFormat("d.M.yy", Locale.GERMAN)
         holder.tvCreatedDate.text = sdfDate.format(Date(todo.createdAt))
 
         // TextWatcher für Auto-Save
+        // Wenn User tippt: ! am Anfang → isPriority setzen, aber ! nicht im Text speichern
         val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                val newText = s?.toString() ?: ""
-                onTextChanged(todo, newText)
+                val typed = s?.toString() ?: ""
+                if (typed.startsWith("!")) {
+                    // ! am Anfang → Prio setzen, aber ! aus Text entfernen
+                    val cleanText = typed.removePrefix("!").trimStart()
+                    todo.isPriority = true
+                    todo.text = "!$cleanText" // intern mit ! speichern für Sortierung
+                    onTextChanged(todo, "!$cleanText")
+                    // Cursor-Position nach dem Entfernen des ! korrigieren
+                    holder.editText.removeTextChangedListener(this)
+                    holder.editText.setText(cleanText)
+                    holder.editText.setSelection(cleanText.length)
+                    holder.editText.addTextChangedListener(this)
+                    // Hintergrund sofort aktualisieren
+                    holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg_priority)
+                } else {
+                    todo.isPriority = false
+                    todo.text = typed
+                    onTextChanged(todo, typed)
+                    holder.cardContent.setBackgroundResource(R.drawable.todo_item_bg)
+                }
             }
         }
         holder.editText.tag = watcher
@@ -84,10 +112,8 @@ class TodoAdapter(
 
         // Complete button: scale press + swipe-right animation then remove
         holder.btnComplete.setOnClickListener {
-            // Disable to prevent double-tap
             holder.btnComplete.isEnabled = false
 
-            // Scale-up the checkmark button first
             holder.btnComplete.animate()
                 .scaleX(1.3f)
                 .scaleY(1.3f)
@@ -98,7 +124,6 @@ class TodoAdapter(
                         .scaleY(1f)
                         .setDuration(80)
                         .withEndAction {
-                            // Swipe the whole card to the right
                             val slideRight = AnimationUtils.loadAnimation(
                                 holder.itemView.context,
                                 R.anim.slide_right_out

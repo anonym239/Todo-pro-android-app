@@ -7,18 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp">
 
-    <!-- Priority indicator bar on the left -->
-    <View
-        android:id="@+id/priorityIndicator"
-        android:layout_width="4dp"
-        android:layout_height="0dp"
-        android:background="#FF4444"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- Card content -->
+    <!-- Card content - priority border is set programmatically via background -->
     <LinearLayout
         android:id="@+id/cardContent"
         android:layout_width="0dp"
@@ -30,7 +19,7 @@
         android:paddingEnd="10dp"
         android:paddingVertical="12dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/priorityIndicator"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Text + reminder time -->

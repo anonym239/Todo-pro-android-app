@@ -43,7 +43,7 @@ object TodoStorage {
     }
 
     fun isComplimentsEnabled(context: Context): Boolean {
-        return getPrefs(context).getBoolean(KEY_COMPLIMENTS, true)
+        return getPrefs(context).getBoolean(KEY_COMPLIMENTS, false)
     }
 
     fun setComplimentsEnabled(context: Context, enabled: Boolean) {

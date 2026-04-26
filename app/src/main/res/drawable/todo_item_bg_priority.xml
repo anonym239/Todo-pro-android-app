@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Roter linker Rand (anliegend an die Karte) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FF4444" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    <!-- Karten-Hintergrund mit Offset links (erzeugt den roten Rand-Effekt) -->
+    <item android:left="4dp">
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/todoCardColor" />
+            <corners
+                android:topRightRadius="16dp"
+                android:bottomRightRadius="16dp"
+                android:topLeftRadius="2dp"
+                android:bottomLeftRadius="2dp" />
+            <stroke
+                android:width="1dp"
+                android:color="?attr/todoDividerColor" />
+        </shape>
+    </item>
+</layer-list>
