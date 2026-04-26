@@ -9,7 +9,7 @@
     android:padding="14dp"
     android:gravity="center_vertical">
 
-    <!-- Header: TODOPRO -->
+    <!-- Header: TODOPRO + Streak -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,19 +21,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TODO"
+            android:text="TODOPRO"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:fontFamily="sans-serif-black" />
+            android:textColor="#FFFFFF" />
 
         <TextView
             android:id="@+id/widgetStreak"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="11sp"
-            android:textColor="#FFD740"
-            android:fontFamily="sans-serif" />
+            android:textColor="#FFD740" />
 
     </LinearLayout>
 
@@ -45,7 +43,6 @@
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#69F0AE"
-        android:fontFamily="sans-serif-black"
         android:layout_marginBottom="4dp" />
 
     <!-- Heute erledigt -->
@@ -55,7 +52,6 @@
         android:layout_height="wrap_content"
         android:textSize="11sp"
         android:textColor="#AAAAAA"
-        android:fontFamily="sans-serif"
         android:layout_marginBottom="8dp" />
 
     <!-- Nächste Todo -->
@@ -65,7 +61,6 @@
         android:layout_height="wrap_content"
         android:textSize="11sp"
         android:textColor="#DDDDDD"
-        android:fontFamily="sans-serif"
         android:maxLines="2"
         android:ellipsize="end" />
 

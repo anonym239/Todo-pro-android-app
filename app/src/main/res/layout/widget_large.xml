@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="8dp">
 
         <TextView
             android:id="@+id/widgetLargeTitle"
@@ -24,16 +24,14 @@
             android:text="TODOPRO"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:fontFamily="sans-serif-black" />
+            android:textColor="#FFFFFF" />
 
         <TextView
             android:id="@+id/widgetLargeStreak"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="13sp"
-            android:textColor="#FFD740"
-            android:fontFamily="sans-serif-medium" />
+            android:textColor="#FFD740" />
 
     </LinearLayout>
 
@@ -44,15 +42,14 @@
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:textColor="#69F0AE"
-        android:fontFamily="sans-serif"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="8dp" />
 
     <!-- Trennlinie -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#33FFFFFF"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="6dp" />
 
     <!-- Todo 1 -->
     <LinearLayout
@@ -61,10 +58,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="4dp"
         android:visibility="gone">
-        <TextView android:id="@+id/widgetDot1" android:layout_width="20dp" android:layout_height="wrap_content" android:textSize="10sp" />
-        <TextView android:id="@+id/widgetTodo1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="12sp" android:textColor="#EEEEEE" android:maxLines="1" android:ellipsize="end" android:fontFamily="sans-serif" />
+        <TextView
+            android:id="@+id/widgetDot1"
+            android:layout_width="18dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textColor="#FFFFFF" />
+        <TextView
+            android:id="@+id/widgetTodo1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:textColor="#EEEEEE"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <!-- Todo 2 -->
@@ -74,10 +84,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="4dp"
         android:visibility="gone">
-        <TextView android:id="@+id/widgetDot2" android:layout_width="20dp" android:layout_height="wrap_content" android:textSize="10sp" />
-        <TextView android:id="@+id/widgetTodo2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="12sp" android:textColor="#EEEEEE" android:maxLines="1" android:ellipsize="end" android:fontFamily="sans-serif" />
+        <TextView
+            android:id="@+id/widgetDot2"
+            android:layout_width="18dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textColor="#FFFFFF" />
+        <TextView
+            android:id="@+id/widgetTodo2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:textColor="#EEEEEE"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <!-- Todo 3 -->
@@ -87,10 +110,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="4dp"
         android:visibility="gone">
-        <TextView android:id="@+id/widgetDot3" android:layout_width="20dp" android:layout_height="wrap_content" android:textSize="10sp" />
-        <TextView android:id="@+id/widgetTodo3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="12sp" android:textColor="#EEEEEE" android:maxLines="1" android:ellipsize="end" android:fontFamily="sans-serif" />
+        <TextView
+            android:id="@+id/widgetDot3"
+            android:layout_width="18dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textColor="#FFFFFF" />
+        <TextView
+            android:id="@+id/widgetTodo3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:textColor="#EEEEEE"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <!-- Todo 4 -->
@@ -100,10 +136,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="4dp"
         android:visibility="gone">
-        <TextView android:id="@+id/widgetDot4" android:layout_width="20dp" android:layout_height="wrap_content" android:textSize="10sp" />
-        <TextView android:id="@+id/widgetTodo4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="12sp" android:textColor="#EEEEEE" android:maxLines="1" android:ellipsize="end" android:fontFamily="sans-serif" />
+        <TextView
+            android:id="@+id/widgetDot4"
+            android:layout_width="18dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textColor="#FFFFFF" />
+        <TextView
+            android:id="@+id/widgetTodo4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:textColor="#EEEEEE"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <!-- Todo 5 -->
@@ -113,10 +162,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="4dp"
         android:visibility="gone">
-        <TextView android:id="@+id/widgetDot5" android:layout_width="20dp" android:layout_height="wrap_content" android:textSize="10sp" />
-        <TextView android:id="@+id/widgetTodo5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textSize="12sp" android:textColor="#EEEEEE" android:maxLines="1" android:ellipsize="end" android:fontFamily="sans-serif" />
+        <TextView
+            android:id="@+id/widgetDot5"
+            android:layout_width="18dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textColor="#FFFFFF" />
+        <TextView
+            android:id="@+id/widgetTodo5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:textColor="#EEEEEE"
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 
     <!-- Mehr -->
@@ -126,7 +188,6 @@
         android:layout_height="wrap_content"
         android:textSize="11sp"
         android:textColor="#888888"
-        android:fontFamily="sans-serif"
         android:visibility="gone" />
 
 </LinearLayout>
