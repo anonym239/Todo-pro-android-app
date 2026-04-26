@@ -285,6 +285,15 @@ class MainActivity : AppCompatActivity() {
         recyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator().apply {
             addDuration = 280; removeDuration = 220; moveDuration = 180; changeDuration = 150
         }
+        // Fokus vom EditText nehmen wenn RecyclerView berührt wird
+        recyclerView.setOnTouchListener { _, _ ->
+            if (editInput.hasFocus()) {
+                editInput.clearFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                imm.hideSoftInputFromWindow(editInput.windowToken, 0)
+            }
+            false
+        }
     }
 
     private fun setupSwipeToDelete() {
@@ -599,7 +608,7 @@ class MainActivity : AppCompatActivity() {
         val total = count + completedToday
 
         tvTodoCount.text = when (count) {
-            0 -> if (completedToday > 0) "✅ Alles erledigt heute!" else ""
+            0 -> if (completedToday > 0) "Alles erledigt heute!" else ""
             1 -> "1 Aufgabe offen"
             else -> "$count Aufgaben offen"
         }
@@ -832,12 +841,22 @@ class MainActivity : AppCompatActivity() {
                 .setInterpolator(OvershootInterpolator(1.2f)).start()
         }
 
-        // Ziel erreicht: Snackbar
+        // Ziel erreicht: Snackbar + Karte nach kurzer Zeit ausblenden
         if (isReached && !TodoStorage.isGoalReachedToday(this)) {
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 showSnackbar("🏆 Tagesziel erreicht! Fantastisch!")
                 launchKonfetti()
             }, 600)
+            // Karte nach 3 Sekunden sanft ausblenden
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                goalCard.animate()
+                    .alpha(0f)
+                    .translationY(-16f)
+                    .setDuration(400)
+                    .setInterpolator(DecelerateInterpolator())
+                    .withEndAction { goalCard.visibility = View.GONE; goalCard.translationY = 0f; goalCard.alpha = 1f }
+                    .start()
+            }, 3000)
         }
     }
 
