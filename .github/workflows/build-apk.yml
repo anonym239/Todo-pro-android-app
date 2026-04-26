@@ -3,7 +3,10 @@ name: Build TodoPro APK
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch:  # Manuell auslösbar
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
