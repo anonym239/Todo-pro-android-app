@@ -1,8 +1,11 @@
 package com.todopro.app
 
 import android.Manifest
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -613,6 +616,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveTodos() {
         TodoStorage.saveTodos(this, todos)
+        updateWidgets()
+    }
+
+    /** Alle Home-Screen Widgets aktualisieren */
+    private fun updateWidgets() {
+        try {
+            val awm = AppWidgetManager.getInstance(this)
+            // Klein-Widget
+            val smallIds = awm.getAppWidgetIds(ComponentName(this, TodoWidgetSmall::class.java))
+            for (id in smallIds) TodoWidgetSmall.updateWidget(this, awm, id)
+            // Groß-Widget
+            val largeIds = awm.getAppWidgetIds(ComponentName(this, TodoWidgetLarge::class.java))
+            for (id in largeIds) TodoWidgetLarge.updateWidget(this, awm, id)
+        } catch (e: Exception) { /* Widget nicht vorhanden – ignorieren */ }
     }
 
     private fun updateEmptyView() {

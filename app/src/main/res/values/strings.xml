@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">TodoPro</string>
     <string name="app_logo"><![CDATA[<font color="#FFFFFF">TODO</font><font color="#CCFF00">PRO</font>]]></string>
+    <string name="widget_small_description">TodoPro Mini-Widget: Zeigt offene Aufgaben und Streak</string>
+    <string name="widget_large_description">TodoPro Liste-Widget: Zeigt deine nächsten 5 Aufgaben</string>
 </resources>
