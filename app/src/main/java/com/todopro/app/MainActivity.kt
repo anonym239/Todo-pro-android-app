@@ -45,11 +45,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: TodoAdapter
     private lateinit var editInput: EditText
     private lateinit var btnAdd: ImageButton
-    private lateinit var btnTheme: ImageButton
-    private lateinit var btnNotifications: ImageButton
-    private lateinit var btnHelp: ImageButton
-    private lateinit var btnStats: ImageButton
-    private lateinit var btnArchive: ImageButton
+    private lateinit var btnMenu: ImageButton
     private lateinit var emptyView: LinearLayout
     private lateinit var konfettiView: KonfettiView
     private lateinit var tvSnackbar: TextView
@@ -60,6 +56,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvProgressPercent: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var tvStreakHeader: TextView
+
+    // Sidebar
+    private lateinit var sidebarPanel: LinearLayout
+    private lateinit var sidebarOverlay: View
+    private lateinit var btnCloseSidebar: ImageButton
+    private lateinit var menuStats: LinearLayout
+    private lateinit var menuArchive: LinearLayout
+    private lateinit var menuTheme: LinearLayout
+    private lateinit var menuNotifications: LinearLayout
+    private lateinit var menuHelp: LinearLayout
+    private var isSidebarOpen = false
 
     private val todos = mutableListOf<TodoItem>()
     private val completedTodos = mutableListOf<TodoItem>()
@@ -111,11 +118,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         editInput = findViewById(R.id.editInput)
         btnAdd = findViewById(R.id.btnAdd)
-        btnTheme = findViewById(R.id.btnTheme)
-        btnNotifications = findViewById(R.id.btnNotifications)
-        btnHelp = findViewById(R.id.btnHelp)
-        btnStats = findViewById(R.id.btnStats)
-        btnArchive = findViewById(R.id.btnArchive)
+        btnMenu = findViewById(R.id.btnMenu)
         emptyView = findViewById(R.id.emptyView)
         konfettiView = findViewById(R.id.konfettiView)
         tvSnackbar = findViewById(R.id.tvSnackbar)
@@ -126,6 +129,16 @@ class MainActivity : AppCompatActivity() {
         tvProgressPercent = findViewById(R.id.tvProgressPercent)
         progressBar = findViewById(R.id.progressBar)
         tvStreakHeader = findViewById(R.id.tvStreakHeader)
+
+        // Sidebar
+        sidebarPanel = findViewById(R.id.sidebarPanel)
+        sidebarOverlay = findViewById(R.id.sidebarOverlay)
+        btnCloseSidebar = findViewById(R.id.btnCloseSidebar)
+        menuStats = findViewById(R.id.menuStats)
+        menuArchive = findViewById(R.id.menuArchive)
+        menuTheme = findViewById(R.id.menuTheme)
+        menuNotifications = findViewById(R.id.menuNotifications)
+        menuHelp = findViewById(R.id.menuHelp)
     }
 
     private fun animateHeaderIn() {
@@ -146,7 +159,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtonAnimations() {
-        listOf(btnAdd, btnTheme, btnNotifications, btnHelp, btnStats, btnArchive).forEach { btn ->
+        listOf(btnAdd, btnMenu).forEach { btn ->
             btn.setOnTouchListener { v, event ->
                 when (event.action) {
                     android.view.MotionEvent.ACTION_DOWN ->
@@ -159,6 +172,57 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // ─── Sidebar ────────────────────────────────────────────────────────────
+
+    private fun openSidebar() {
+        if (isSidebarOpen) return
+        isSidebarOpen = true
+        sidebarPanel.visibility = View.VISIBLE
+        sidebarOverlay.visibility = View.VISIBLE
+        sidebarOverlay.alpha = 0f
+
+        // Panel von rechts einfahren
+        sidebarPanel.translationX = 280f.dpToPx()
+        sidebarPanel.animate()
+            .translationX(0f)
+            .setDuration(300)
+            .setInterpolator(DecelerateInterpolator(1.5f))
+            .start()
+
+        // Overlay einblenden
+        sidebarOverlay.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .start()
+    }
+
+    private fun closeSidebar() {
+        if (!isSidebarOpen) return
+        isSidebarOpen = false
+
+        sidebarPanel.animate()
+            .translationX(280f.dpToPx())
+            .setDuration(260)
+            .setInterpolator(DecelerateInterpolator())
+            .withEndAction {
+                sidebarPanel.visibility = View.GONE
+            }
+            .start()
+
+        sidebarOverlay.animate()
+            .alpha(0f)
+            .setDuration(260)
+            .withEndAction {
+                sidebarOverlay.visibility = View.GONE
+            }
+            .start()
+    }
+
+    private fun Float.dpToPx(): Float =
+        this * resources.displayMetrics.density
+
+    // ────────────────────────────────────────────────────────────────────────
 
     private fun loadTodos() {
         todos.clear()
@@ -184,13 +248,12 @@ class MainActivity : AppCompatActivity() {
                 saveTodos()
             },
             onReminderSuggestion = { todo, suggestedTime ->
-                // Erinnerungsvorschlag direkt setzen
                 todo.reminderTime = suggestedTime
                 saveTodos()
                 AlarmScheduler.scheduleAlarm(this, todo)
                 adapter.notifyDataSetChanged()
-                val sdf = java.text.SimpleDateFormat("dd.MM. HH:mm", java.util.Locale.GERMAN)
-                showSnackbar("⏰ Erinnerung gesetzt: ${sdf.format(java.util.Date(suggestedTime))}")
+                val sdf = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMAN)
+                showSnackbar("⏰ Erinnerung gesetzt: ${sdf.format(Date(suggestedTime))}")
             },
             onCategoryChanged = { todo ->
                 saveTodos()
@@ -207,7 +270,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Swipe-to-Delete: nach links wischen löscht die Todo
     private fun setupSwipeToDelete() {
         val swipeCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
@@ -220,7 +282,6 @@ class MainActivity : AppCompatActivity() {
                 deleteTodo(todo)
                 vibrate(50)
                 showSnackbarWithUndo("🗑️ Aufgabe gelöscht") {
-                    // Undo: Todo wiederherstellen
                     lastDeletedTodo?.let { restored ->
                         todos.add(0, restored)
                         sortTodos()
@@ -242,12 +303,10 @@ class MainActivity : AppCompatActivity() {
                 val icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_delete)
 
                 if (dX < 0) {
-                    // Roter Hintergrund beim Wischen
                     c.drawRect(
                         itemView.right + dX, itemView.top.toFloat(),
                         itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                     )
-                    // Lösch-Icon
                     icon?.let {
                         val iconMargin = (itemView.height - it.intrinsicHeight) / 2
                         val iconTop = itemView.top + iconMargin
@@ -277,24 +336,61 @@ class MainActivity : AppCompatActivity() {
             else editInput.animate().scaleX(1f).scaleY(1f).setDuration(150).start()
         }
 
-        btnTheme.setOnClickListener {
-            isDarkMode = !isDarkMode
-            TodoStorage.setDarkMode(this, isDarkMode)
-            recreate()
+        // 3-Striche Menü
+        btnMenu.setOnClickListener { openSidebar() }
+
+        // Overlay schließt Sidebar
+        sidebarOverlay.setOnClickListener { closeSidebar() }
+
+        // Schließen-Button in Sidebar
+        btnCloseSidebar.setOnClickListener { closeSidebar() }
+
+        // Sidebar-Menü-Einträge
+        menuStats.setOnClickListener {
+            closeSidebar()
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                startActivity(Intent(this, StatsActivity::class.java))
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+            }, 200)
         }
 
-        btnNotifications.setOnClickListener { showNotificationSettings() }
-        btnHelp.setOnClickListener { showHelpDialog() }
-        btnStats.setOnClickListener {
-            val intent = Intent(this, StatsActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+        menuArchive.setOnClickListener {
+            closeSidebar()
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                startActivity(Intent(this, ArchiveActivity::class.java))
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+            }, 200)
         }
 
-        btnArchive.setOnClickListener {
-            val intent = Intent(this, ArchiveActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+        menuTheme.setOnClickListener {
+            closeSidebar()
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                isDarkMode = !isDarkMode
+                TodoStorage.setDarkMode(this, isDarkMode)
+                recreate()
+            }, 200)
+        }
+
+        menuNotifications.setOnClickListener {
+            closeSidebar()
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                showNotificationSettings()
+            }, 200)
+        }
+
+        menuHelp.setOnClickListener {
+            closeSidebar()
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                showHelpDialog()
+            }, 200)
+        }
+    }
+
+    override fun onBackPressed() {
+        if (isSidebarOpen) {
+            closeSidebar()
+        } else {
+            super.onBackPressed()
         }
     }
 
@@ -342,7 +438,6 @@ class MainActivity : AppCompatActivity() {
             todos.removeAt(index)
             adapter.notifyItemRemoved(index)
 
-            // Als erledigt speichern
             val completedTodo = todo.copy(isCompleted = true, completedAt = System.currentTimeMillis())
             completedTodos.add(completedTodo)
             TodoStorage.saveCompletedTodos(this, completedTodos)
@@ -353,13 +448,11 @@ class MainActivity : AppCompatActivity() {
             updateTodoCount()
             updateStreakHeader()
 
-            // Haptic Feedback
             vibrate(80)
 
             if (TodoStorage.isKonfettiEnabled(this)) launchKonfetti()
             if (TodoStorage.isComplimentsEnabled(this)) showCompliment()
 
-            // Streak-Meldung
             val streak = TodoStorage.getStreak(this)
             if (streak > 1 && streak % 5 == 0) {
                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
@@ -369,7 +462,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Haptic Feedback
     private fun vibrate(ms: Long) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -477,7 +569,6 @@ class MainActivity : AppCompatActivity() {
         tvTodoCount.alpha = 0f
         tvTodoCount.animate().alpha(1f).setDuration(300).start()
 
-        // Fortschrittsbalken
         if (total > 0 && completedToday > 0) {
             val percent = (completedToday * 100) / total
             progressBar.visibility = View.VISIBLE
@@ -619,17 +710,14 @@ class MainActivity : AppCompatActivity() {
         updateWidgets()
     }
 
-    /** Alle Home-Screen Widgets aktualisieren */
     private fun updateWidgets() {
         try {
             val awm = AppWidgetManager.getInstance(this)
-            // Klein-Widget
             val smallIds = awm.getAppWidgetIds(ComponentName(this, TodoWidgetSmall::class.java))
             for (id in smallIds) TodoWidgetSmall.updateWidget(this, awm, id)
-            // Groß-Widget
             val largeIds = awm.getAppWidgetIds(ComponentName(this, TodoWidgetLarge::class.java))
             for (id in largeIds) TodoWidgetLarge.updateWidget(this, awm, id)
-        } catch (e: Exception) { /* Widget nicht vorhanden – ignorieren */ }
+        } catch (e: Exception) { /* ignore */ }
     }
 
     private fun updateEmptyView() {

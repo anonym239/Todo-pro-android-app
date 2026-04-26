@@ -8,6 +8,8 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -22,7 +24,6 @@ object UpdateChecker {
     private const val GITHUB_REPO = "Todo-pro-android-app"
     private const val TAG = "UpdateChecker"
     private const val PREFS_NAME = "todopro_prefs"
-    // Nur wenn User "Später" klickt wird diese Version gespeichert
     private const val KEY_SNOOZED_VERSION = "snoozed_update_version"
 
     fun checkForUpdate(context: Context, currentVersion: String) {
@@ -48,7 +49,6 @@ object UpdateChecker {
                     val releaseUrl = json.getString("html_url")
                     val releaseName = json.optString("name", "Version $latestTag")
 
-                    // APK Download-URL aus Assets holen
                     var apkDownloadUrl: String? = null
                     val assets = json.optJSONArray("assets")
                     if (assets != null) {
@@ -65,12 +65,10 @@ object UpdateChecker {
                     val currentClean = currentVersion.trimStart('v').trim()
                     val latestClean = latestTag.trim()
 
-                    // Nur wenn User "Später" geklickt hat für DIESE Version → nicht nochmal zeigen
                     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                     val snoozedVersion = prefs.getString(KEY_SNOOZED_VERSION, "") ?: ""
 
                     Log.d(TAG, "Current: '$currentClean' | Latest: '$latestClean' | Snoozed: '$snoozedVersion'")
-                    Log.d(TAG, "isNewer: ${isNewerVersion(latestClean, currentClean)}")
 
                     if (isNewerVersion(latestClean, currentClean) && latestClean != snoozedVersion) {
                         (context as? androidx.appcompat.app.AppCompatActivity)?.runOnUiThread {
@@ -87,7 +85,6 @@ object UpdateChecker {
         }.start()
     }
 
-    // Vergleicht Versionen: "1.0.5" > "1.0.3" → true
     private fun isNewerVersion(latest: String, current: String): Boolean {
         return try {
             val latestParts = latest.split(".").map { it.trim().toIntOrNull() ?: 0 }
@@ -101,7 +98,6 @@ object UpdateChecker {
             }
             false
         } catch (e: Exception) {
-            Log.e(TAG, "Versionsvergleich fehlgeschlagen: ${e.message}")
             false
         }
     }
@@ -119,7 +115,6 @@ object UpdateChecker {
             .setTitle("🔄 Update verfügbar!")
             .setMessage("Neue Version verfügbar:\n\n📦 $releaseName\n\nAktuell installiert: ${getCurrentVersion(activity)}\n\nMöchtest du jetzt aktualisieren?")
             .setPositiveButton("⬇️ Jetzt installieren") { _, _ ->
-                // Bei Installation: NICHT snoosen - beim nächsten Start nochmal prüfen
                 if (apkUrl != null) {
                     downloadAndInstallApk(activity, apkUrl, version)
                 } else {
@@ -128,7 +123,6 @@ object UpdateChecker {
                 }
             }
             .setNegativeButton("Später") { _, _ ->
-                // Nur bei "Später": Version snoosen damit Dialog nicht bei jedem Start kommt
                 snoozeVersion(context, version)
             }
             .setCancelable(false)
@@ -141,43 +135,68 @@ object UpdateChecker {
         } catch (e: Exception) { "?" }
     }
 
-    // Merkt sich die Version für "Später" - wird beim nächsten App-Start NICHT mehr gezeigt
     private fun snoozeVersion(context: Context, version: String) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_SNOOZED_VERSION, version)
-            .apply()
-        Log.d(TAG, "Version $version gesnoozed")
+            .edit().putString(KEY_SNOOZED_VERSION, version).apply()
     }
 
-    // Snoozed-Version zurücksetzen (z.B. nach erfolgreicher Installation)
     fun clearSnooze(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .remove(KEY_SNOOZED_VERSION)
-            .apply()
+            .edit().remove(KEY_SNOOZED_VERSION).apply()
     }
 
     private fun downloadAndInstallApk(context: Context, apkUrl: String, version: String) {
         try {
             val fileName = "TodoPro-v$version.apk"
+
+            // Alte APK löschen falls vorhanden
+            val oldFile = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                fileName
+            )
+            if (oldFile.exists()) oldFile.delete()
+
             val request = DownloadManager.Request(Uri.parse(apkUrl)).apply {
                 setTitle("TodoPro Update")
                 setDescription("Version $version wird heruntergeladen...")
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
                 setMimeType("application/vnd.android.package-archive")
+                // Wichtig: Auch über mobile Daten erlauben
+                setAllowedOverMetered(true)
+                setAllowedOverRoaming(true)
             }
 
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val downloadId = downloadManager.enqueue(request)
+
+            Log.d(TAG, "Download gestartet: ID=$downloadId, URL=$apkUrl")
 
             val receiver = object : BroadcastReceiver() {
                 override fun onReceive(ctx: Context, intent: Intent) {
                     val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
                     if (id == downloadId) {
                         ctx.unregisterReceiver(this)
-                        installApk(ctx, fileName)
+
+                        // Download-Status prüfen
+                        val query = DownloadManager.Query().setFilterById(downloadId)
+                        val cursor = downloadManager.query(query)
+                        if (cursor.moveToFirst()) {
+                            val statusCol = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+                            val status = if (statusCol >= 0) cursor.getInt(statusCol) else -1
+                            cursor.close()
+
+                            if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                                Log.d(TAG, "Download erfolgreich, starte Installation...")
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    installApkAndRestart(ctx, fileName)
+                                }, 500)
+                            } else {
+                                Log.e(TAG, "Download fehlgeschlagen: Status=$status")
+                            }
+                        } else {
+                            cursor.close()
+                        }
                     }
                 }
             }
@@ -201,7 +220,7 @@ object UpdateChecker {
         }
     }
 
-    private fun installApk(context: Context, fileName: String) {
+    private fun installApkAndRestart(context: Context, fileName: String) {
         try {
             val file = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
@@ -222,11 +241,29 @@ object UpdateChecker {
                 Uri.fromFile(file)
             }
 
-            val intent = Intent(Intent.ACTION_VIEW).apply {
+            // Nach der Installation: App neu starten
+            // Wir registrieren einen PackageReplaced-Receiver der die App neu startet
+            val restartIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+            restartIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+            val installIntent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, "application/vnd.android.package-archive")
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
-            context.startActivity(intent)
+
+            // Snooze löschen damit nach Neustart kein Dialog mehr kommt
+            clearSnooze(context)
+
+            context.startActivity(installIntent)
+
+            // App nach kurzer Verzögerung schließen (Android öffnet sie nach Installation selbst)
+            Handler(Looper.getMainLooper()).postDelayed({
+                try {
+                    (context as? androidx.appcompat.app.AppCompatActivity)?.finishAffinity()
+                } catch (e: Exception) {
+                    android.os.Process.killProcess(android.os.Process.myPid())
+                }
+            }, 1000)
 
         } catch (e: Exception) {
             Log.e(TAG, "Installation fehlgeschlagen: ${e.message}")
