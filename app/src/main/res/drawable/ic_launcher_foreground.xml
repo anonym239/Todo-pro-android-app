@@ -5,23 +5,14 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Rounded square background (roter Hintergrund) -->
+    <!-- Roter Hintergrund -->
     <path
         android:fillColor="#E8194B"
         android:pathData="M0,0 L108,0 L108,108 L0,108 Z" />
 
-    <!-- Checkmark rounded square outline (weißer Rahmen mit abgerundeten Ecken) -->
+    <!-- Weißes Häkchen (wie im Bild - dick und geschwungen) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M30,20 Q20,20 20,30 L20,78 Q20,88 30,88 L78,88 Q88,88 88,78 L88,30 Q88,20 78,20 Z M30,26 L78,26 Q82,26 82,30 L82,78 Q82,82 78,82 L30,82 Q26,82 26,78 L26,30 Q26,26 30,26 Z" />
-
-    <!-- Checkmark (weißes Häkchen) -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="6"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M36,54 L48,66 L72,42" />
+        android:pathData="M28,55 C30,53 33,52 36,54 L46,64 L72,34 C75,31 79,30 82,33 C85,36 84,40 81,43 L49,76 C47,78 44,79 42,78 C40,77 38,76 37,74 L26,60 C24,57 25,57 28,55 Z" />
 
 </vector>

@@ -4,6 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class SplashActivity : AppCompatActivity() {
@@ -12,10 +15,28 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // Nach 1.5 Sekunden zur MainActivity wechseln
+        val iconView = findViewById<ImageView>(R.id.splashIcon)
+        val logoText = findViewById<TextView>(R.id.logoText)
+        val subText = findViewById<TextView>(R.id.subText)
+
+        // Icon: Scale + Bounce Animation
+        val scaleAnim = AnimationUtils.loadAnimation(this, R.anim.scale_up)
+        iconView.startAnimation(scaleAnim)
+
+        // Logo Text: Slide up + Fade in
+        val slideAnim = AnimationUtils.loadAnimation(this, R.anim.slide_up)
+        logoText.startAnimation(slideAnim)
+
+        // Sub Text: Slide up mit Verzögerung
+        val slideAnim2 = AnimationUtils.loadAnimation(this, R.anim.slide_up)
+        slideAnim2.startOffset = 500
+        subText.startAnimation(slideAnim2)
+
+        // Nach 2 Sekunden zur MainActivity
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this, MainActivity::class.java))
+            overridePendingTransition(R.anim.fade_in, android.R.anim.fade_out)
             finish()
-        }, 1500)
+        }, 2000)
     }
 }
