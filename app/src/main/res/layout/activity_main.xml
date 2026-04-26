@@ -132,6 +132,66 @@
 
     </LinearLayout>
 
+    <!-- Tagesziel-Karte -->
+    <LinearLayout
+        android:id="@+id/goalCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="?attr/todoCardColor"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/inputRow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🎯"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvGoalLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="8"
+                android:textSize="13sp"
+                android:textColor="?attr/todoTextColor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvGoalCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/neon_green"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/goalProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:progressDrawable="@drawable/goal_progress_bg"
+            android:max="100"
+            android:progress="0" />
+
+    </LinearLayout>
+
     <!-- Fortschrittsbalken + Stats -->
     <LinearLayout
         android:id="@+id/statsBar"
@@ -140,7 +200,7 @@
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
         android:paddingBottom="8dp"
-        app:layout_constraintTop_toBottomOf="@id/inputRow"
+        app:layout_constraintTop_toBottomOf="@id/goalCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -432,6 +492,60 @@
                 android:textColor="?attr/todoTextColor"
                 android:fontFamily="sans-serif" />
         </LinearLayout>
+
+        <!-- Tagesziel -->
+        <LinearLayout
+            android:id="@+id/menuGoal"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="20dp"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_goal"
+                android:layout_marginEnd="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tagesziel setzen"
+                android:textSize="16sp"
+                android:textColor="?attr/todoTextColor"
+                android:fontFamily="sans-serif" />
+        </LinearLayout>
+
+        <!-- Monats-Rückblick -->
+        <LinearLayout
+            android:id="@+id/menuMonthlyReview"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="20dp"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_calendar"
+                android:layout_marginEnd="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Monats-Rückblick"
+                android:textSize="16sp"
+                android:textColor="?attr/todoTextColor"
+                android:fontFamily="sans-serif" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/todoDividerColor"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="8dp" />
 
         <!-- Hilfe -->
         <LinearLayout

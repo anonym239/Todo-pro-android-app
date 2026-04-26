@@ -21,6 +21,13 @@ object TodoStorage {
     private const val KEY_DAILY_SUMMARY_HOUR = "daily_summary_hour"
     private const val KEY_COMPLETED_TODAY = "completed_today"
     private const val KEY_COMPLETED_TODAY_DATE = "completed_today_date"
+    // Tagesziel
+    private const val KEY_DAILY_GOAL = "daily_goal"
+    private const val KEY_DAILY_GOAL_DATE = "daily_goal_date"
+    // Monatsdaten: Key = "day_YYYY-MM-DD", Value = Anzahl erledigter Todos
+    private const val KEY_DAY_PREFIX = "day_"
+    // Tagesziel-Erfolge: Key = "goal_reached_YYYY-MM-DD"
+    private const val KEY_GOAL_REACHED_PREFIX = "goal_reached_"
 
     private val gson = Gson()
 
@@ -193,5 +200,95 @@ object TodoStorage {
 
     fun setDailySummaryHour(context: Context, hour: Int) {
         getPrefs(context).edit().putInt(KEY_DAILY_SUMMARY_HOUR, hour).apply()
+    }
+
+    // ── Tagesziel ──────────────────────────────────────────────────────────
+
+    /** Tagesziel setzen (0 = kein Ziel) */
+    fun setDailyGoal(context: Context, goal: Int) {
+        val today = getTodayString()
+        getPrefs(context).edit()
+            .putInt(KEY_DAILY_GOAL, goal)
+            .putString(KEY_DAILY_GOAL_DATE, today)
+            .apply()
+    }
+
+    /** Aktuelles Tagesziel (0 = kein Ziel) */
+    fun getDailyGoal(context: Context): Int {
+        return getPrefs(context).getInt(KEY_DAILY_GOAL, 0)
+    }
+
+    /** Prüft ob das Tagesziel heute schon erreicht wurde und speichert es */
+    fun checkAndRecordGoalReached(context: Context) {
+        val goal = getDailyGoal(context)
+        if (goal <= 0) return
+        val completedToday = getCompletedToday(context)
+        if (completedToday >= goal) {
+            val today = getFullTodayString()
+            getPrefs(context).edit()
+                .putBoolean("$KEY_GOAL_REACHED_PREFIX$today", true)
+                .apply()
+        }
+    }
+
+    /** Wurde das Tagesziel heute erreicht? */
+    fun isGoalReachedToday(context: Context): Boolean {
+        val today = getFullTodayString()
+        return getPrefs(context).getBoolean("$KEY_GOAL_REACHED_PREFIX$today", false)
+    }
+
+    // ── Monatsdaten ────────────────────────────────────────────────────────
+
+    /** Speichert die Anzahl erledigter Todos für heute (wird bei recordTodoCompleted aufgerufen) */
+    fun recordDayCount(context: Context, count: Int) {
+        val today = getFullTodayString()
+        getPrefs(context).edit()
+            .putInt("$KEY_DAY_PREFIX$today", count)
+            .apply()
+    }
+
+    /** Gibt die Anzahl erledigter Todos für einen bestimmten Tag zurück */
+    fun getDayCount(context: Context, year: Int, month: Int, day: Int): Int {
+        val key = "$KEY_DAY_PREFIX${String.format("%04d-%02d-%02d", year, month + 1, day)}"
+        return getPrefs(context).getInt(key, 0)
+    }
+
+    /** Gibt alle Tagesdaten für einen Monat zurück: Map<Tag(1-31), Anzahl> */
+    fun getMonthData(context: Context, year: Int, month: Int): Map<Int, Int> {
+        val prefs = getPrefs(context)
+        val result = mutableMapOf<Int, Int>()
+        val cal = Calendar.getInstance()
+        cal.set(year, month, 1)
+        val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+        for (day in 1..daysInMonth) {
+            val key = "$KEY_DAY_PREFIX${String.format("%04d-%02d-%02d", year, month + 1, day)}"
+            val count = prefs.getInt(key, 0)
+            if (count > 0) result[day] = count
+        }
+        return result
+    }
+
+    /** Gibt zurück wie oft das Tagesziel in einem Monat erreicht wurde */
+    fun getGoalReachedCountInMonth(context: Context, year: Int, month: Int): Int {
+        val prefs = getPrefs(context)
+        val cal = Calendar.getInstance()
+        cal.set(year, month, 1)
+        val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+        var count = 0
+        for (day in 1..daysInMonth) {
+            val key = "$KEY_GOAL_REACHED_PREFIX${String.format("%04d-%02d-%02d", year, month + 1, day)}"
+            if (prefs.getBoolean(key, false)) count++
+        }
+        return count
+    }
+
+    private fun getFullTodayString(): String {
+        val cal = Calendar.getInstance()
+        return String.format(
+            "%04d-%02d-%02d",
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH) + 1,
+            cal.get(Calendar.DAY_OF_MONTH)
+        )
     }
 }

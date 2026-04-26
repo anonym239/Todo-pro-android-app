@@ -57,6 +57,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var tvStreakHeader: TextView
 
+    // Tagesziel
+    private lateinit var goalCard: LinearLayout
+    private lateinit var tvGoalLabel: TextView
+    private lateinit var tvGoalCount: TextView
+    private lateinit var goalProgressBar: ProgressBar
+
     // Sidebar
     private lateinit var sidebarPanel: LinearLayout
     private lateinit var sidebarOverlay: View
@@ -65,6 +71,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var menuArchive: LinearLayout
     private lateinit var menuTheme: LinearLayout
     private lateinit var menuNotifications: LinearLayout
+    private lateinit var menuGoal: LinearLayout
+    private lateinit var menuMonthlyReview: LinearLayout
     private lateinit var menuHelp: LinearLayout
     private var isSidebarOpen = false
 
@@ -96,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         checkExactAlarmPermission()
         updateEmptyView()
         updateTodoCount()
+        updateGoalCard()
         updateStreakHeader()
         scheduleDailySummaryIfNeeded()
 
@@ -130,6 +139,12 @@ class MainActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         tvStreakHeader = findViewById(R.id.tvStreakHeader)
 
+        // Tagesziel
+        goalCard = findViewById(R.id.goalCard)
+        tvGoalLabel = findViewById(R.id.tvGoalLabel)
+        tvGoalCount = findViewById(R.id.tvGoalCount)
+        goalProgressBar = findViewById(R.id.goalProgressBar)
+
         // Sidebar
         sidebarPanel = findViewById(R.id.sidebarPanel)
         sidebarOverlay = findViewById(R.id.sidebarOverlay)
@@ -138,6 +153,8 @@ class MainActivity : AppCompatActivity() {
         menuArchive = findViewById(R.id.menuArchive)
         menuTheme = findViewById(R.id.menuTheme)
         menuNotifications = findViewById(R.id.menuNotifications)
+        menuGoal = findViewById(R.id.menuGoal)
+        menuMonthlyReview = findViewById(R.id.menuMonthlyReview)
         menuHelp = findViewById(R.id.menuHelp)
     }
 
@@ -378,6 +395,21 @@ class MainActivity : AppCompatActivity() {
             }, 200)
         }
 
+        menuGoal.setOnClickListener {
+            closeSidebar()
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                showDailyGoalDialog()
+            }, 200)
+        }
+
+        menuMonthlyReview.setOnClickListener {
+            closeSidebar()
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                startActivity(Intent(this, MonthlyReviewActivity::class.java))
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+            }, 200)
+        }
+
         menuHelp.setOnClickListener {
             closeSidebar()
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
@@ -442,10 +474,15 @@ class MainActivity : AppCompatActivity() {
             completedTodos.add(completedTodo)
             TodoStorage.saveCompletedTodos(this, completedTodos)
             TodoStorage.recordTodoCompleted(this)
+            // Tagesdaten für Monatsrückblick speichern
+            TodoStorage.recordDayCount(this, TodoStorage.getCompletedToday(this))
+            // Tagesziel prüfen
+            TodoStorage.checkAndRecordGoalReached(this)
 
             saveTodos()
             updateEmptyView()
             updateTodoCount()
+            updateGoalCard()
             updateStreakHeader()
 
             vibrate(80)
@@ -761,5 +798,94 @@ class MainActivity : AppCompatActivity() {
                 }
                 .setNegativeButton("Später", null).show()
         }
+    }
+
+    // ─── Tagesziel ───────────────────────────────────────────────────────────
+
+    private fun updateGoalCard() {
+        val goal = TodoStorage.getDailyGoal(this)
+        if (goal <= 0) {
+            goalCard.visibility = View.GONE
+            return
+        }
+
+        val completedToday = TodoStorage.getCompletedToday(this)
+        val percent = minOf((completedToday * 100) / goal, 100)
+        val isReached = completedToday >= goal
+
+        goalCard.visibility = View.VISIBLE
+
+        tvGoalLabel.text = if (isReached) "🏆 Tagesziel erreicht!" else "Tagesziel: $goal Aufgaben"
+        tvGoalCount.text = "$completedToday / $goal"
+
+        // Fortschrittsbalken animieren
+        val animator = android.animation.ObjectAnimator.ofInt(goalProgressBar, "progress", goalProgressBar.progress, percent)
+        animator.duration = 500
+        animator.interpolator = DecelerateInterpolator()
+        animator.start()
+
+        // Karte einblenden wenn neu sichtbar
+        if (goalCard.alpha == 0f) {
+            goalCard.alpha = 0f
+            goalCard.translationY = -20f
+            goalCard.animate().alpha(1f).translationY(0f).setDuration(350)
+                .setInterpolator(OvershootInterpolator(1.2f)).start()
+        }
+
+        // Ziel erreicht: Snackbar
+        if (isReached && !TodoStorage.isGoalReachedToday(this)) {
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                showSnackbar("🏆 Tagesziel erreicht! Fantastisch!")
+                launchKonfetti()
+            }, 600)
+        }
+    }
+
+    private fun showDailyGoalDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_daily_goal, null)
+        val btnGoal1 = dialogView.findViewById<LinearLayout>(R.id.btnGoal1)
+        val btnGoal3 = dialogView.findViewById<LinearLayout>(R.id.btnGoal3)
+        val btnGoal5 = dialogView.findViewById<LinearLayout>(R.id.btnGoal5)
+        val btnGoal10 = dialogView.findViewById<LinearLayout>(R.id.btnGoal10)
+        val editGoalNumber = dialogView.findViewById<EditText>(R.id.editGoalNumber)
+        val btnSetGoal = dialogView.findViewById<Button>(R.id.btnSetGoal)
+        val btnClearGoal = dialogView.findViewById<TextView>(R.id.btnClearGoal)
+        val btnClose = dialogView.findViewById<ImageButton>(R.id.btnClose)
+
+        // Aktuelles Ziel anzeigen
+        val currentGoal = TodoStorage.getDailyGoal(this)
+        if (currentGoal > 0) editGoalNumber.setText("$currentGoal")
+
+        val dialog = AlertDialog.Builder(this, R.style.ReminderDialogTheme)
+            .setView(dialogView).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        fun setGoal(goal: Int) {
+            TodoStorage.setDailyGoal(this, goal)
+            updateGoalCard()
+            showSnackbar("🎯 Tagesziel: $goal Aufgaben")
+            dialog.dismiss()
+        }
+
+        btnGoal1.setOnClickListener { setGoal(1) }
+        btnGoal3.setOnClickListener { setGoal(3) }
+        btnGoal5.setOnClickListener { setGoal(5) }
+        btnGoal10.setOnClickListener { setGoal(10) }
+
+        btnSetGoal.setOnClickListener {
+            val num = editGoalNumber.text.toString().trim().toIntOrNull()
+            if (num != null && num > 0) setGoal(num)
+            else Toast.makeText(this, "Bitte eine gültige Zahl eingeben", Toast.LENGTH_SHORT).show()
+        }
+
+        btnClearGoal.setOnClickListener {
+            TodoStorage.setDailyGoal(this, 0)
+            updateGoalCard()
+            showSnackbar("Tagesziel entfernt")
+            dialog.dismiss()
+        }
+
+        btnClose.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 }

@@ -55,6 +55,12 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Monats-Rückblick-Activity -->
+        <activity
+            android:name=".MonthlyReviewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- BroadcastReceiver für Alarm-Benachrichtigungen -->
         <receiver
             android:name=".AlarmReceiver"

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/todoCardColor"
+    android:padding="24dp">
+
+    <!-- Titel -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🎯 Tagesziel setzen"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="?attr/todoTextColor" />
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/btn_icon_bg"
+            android:src="@drawable/ic_close"
+            android:contentDescription="Schließen"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <!-- Beschreibung -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wie viele Aufgaben möchtest du heute erledigen?"
+        android:textSize="14sp"
+        android:textColor="?attr/todoHintColor"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Schnellauswahl Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="20dp">
+
+        <LinearLayout
+            android:id="@+id/btnGoal1"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/btn_complete_bg"
+            android:layout_marginEnd="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aufgabe"
+                android:textSize="10sp"
+                android:textColor="#CCFFFFFF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnGoal3"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/btn_complete_bg"
+            android:layout_marginEnd="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aufgaben"
+                android:textSize="10sp"
+                android:textColor="#CCFFFFFF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnGoal5"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/btn_complete_bg"
+            android:layout_marginEnd="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aufgaben"
+                android:textSize="10sp"
+                android:textColor="#CCFFFFFF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnGoal10"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/btn_complete_bg">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aufgaben"
+                android:textSize="10sp"
+                android:textColor="#CCFFFFFF" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Eigene Zahl eingeben -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Oder eigene Zahl:"
+        android:textSize="13sp"
+        android:textColor="?attr/todoHintColor"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="20dp">
+
+        <EditText
+            android:id="@+id/editGoalNumber"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:hint="z.B. 7"
+            android:textColorHint="?attr/todoHintColor"
+            android:textColor="?attr/todoTextColor"
+            android:textSize="18sp"
+            android:background="@drawable/input_bg"
+            android:paddingHorizontal="16dp"
+            android:inputType="number"
+            android:singleLine="true"
+            android:layout_marginEnd="12dp" />
+
+        <Button
+            android:id="@+id/btnSetGoal"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:text="Setzen"
+            android:textColor="#000000"
+            android:backgroundTint="@color/neon_yellow"
+            android:paddingHorizontal="20dp" />
+
+    </LinearLayout>
+
+    <!-- Ziel deaktivieren -->
+    <TextView
+        android:id="@+id/btnClearGoal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kein Tagesziel"
+        android:textSize="13sp"
+        android:textColor="?attr/todoHintColor"
+        android:gravity="center"
+        android:padding="8dp" />
+
+</LinearLayout>

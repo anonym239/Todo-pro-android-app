@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/todoBgColor">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="22dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/btn_icon_bg"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Zurück"
+            android:padding="10dp"
+            android:layout_marginEnd="12dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📅 Monats-Rückblick"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="?attr/todoTextColor" />
+
+            <TextView
+                android:id="@+id/tvMonthTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/neon_yellow"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Monat wechseln: zurück -->
+        <ImageButton
+            android:id="@+id/btnPrevMonth"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/btn_icon_bg"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Vorheriger Monat"
+            android:padding="10dp"
+            android:layout_marginEnd="4dp" />
+
+        <!-- Monat wechseln: vor -->
+        <ImageButton
+            android:id="@+id/btnNextMonth"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/btn_icon_bg"
+            android:src="@drawable/ic_forward"
+            android:contentDescription="Nächster Monat"
+            android:padding="10dp" />
+
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?attr/todoDividerColor"
+        android:layout_marginHorizontal="20dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ScrollView für Inhalt -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Zusammenfassung Karte -->
+            <LinearLayout
+                android:id="@+id/cardSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="?attr/todoCardColor"
+                android:padding="20dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Zusammenfassung"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/todoTextColor"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Gesamt erledigt -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="✅ Gesamt erledigt"
+                        android:textSize="14sp"
+                        android:textColor="?attr/todoHintColor" />
+                    <TextView
+                        android:id="@+id/tvTotalCompleted"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/neon_green" />
+                </LinearLayout>
+
+                <!-- Bester Tag -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🏆 Bester Tag"
+                        android:textSize="14sp"
+                        android:textColor="?attr/todoHintColor" />
+                    <TextView
+                        android:id="@+id/tvBestDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/neon_yellow" />
+                </LinearLayout>
+
+                <!-- Aktive Tage -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="📅 Aktive Tage"
+                        android:textSize="14sp"
+                        android:textColor="?attr/todoHintColor" />
+                    <TextView
+                        android:id="@+id/tvActiveDays"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/todoTextColor" />
+                </LinearLayout>
+
+                <!-- Durchschnitt pro Tag -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="📊 Ø pro aktivem Tag"
+                        android:textSize="14sp"
+                        android:textColor="?attr/todoHintColor" />
+                    <TextView
+                        android:id="@+id/tvAvgPerDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/todoTextColor" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Tagesziel-Statistik -->
+            <LinearLayout
+                android:id="@+id/cardGoalStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="?attr/todoCardColor"
+                android:padding="20dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎯 Tagesziel-Statistik"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/todoTextColor"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🏅 Ziel erreicht"
+                        android:textSize="14sp"
+                        android:textColor="?attr/todoHintColor" />
+                    <TextView
+                        android:id="@+id/tvGoalReached"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/neon_green" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="📈 Erfolgsquote"
+                        android:textSize="14sp"
+                        android:textColor="?attr/todoHintColor" />
+                    <TextView
+                        android:id="@+id/tvGoalSuccessRate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/neon_yellow" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Tages-Heatmap Titel -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aktivität pro Tag"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="?attr/todoTextColor"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Heatmap Grid (7 Spalten = Wochentage) -->
+            <LinearLayout
+                android:id="@+id/heatmapContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="?attr/todoCardColor"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <!-- Wochentag-Labels -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Mo" android:textSize="10sp" android:textColor="?attr/todoHintColor" android:gravity="center"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Di" android:textSize="10sp" android:textColor="?attr/todoHintColor" android:gravity="center"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Mi" android:textSize="10sp" android:textColor="?attr/todoHintColor" android:gravity="center"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Do" android:textSize="10sp" android:textColor="?attr/todoHintColor" android:gravity="center"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fr" android:textSize="10sp" android:textColor="?attr/todoHintColor" android:gravity="center"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Sa" android:textSize="10sp" android:textColor="?attr/todoHintColor" android:gravity="center"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="So" android:textSize="10sp" android:textColor="?attr/todoHintColor" android:gravity="center"/>
+                </LinearLayout>
+
+                <!-- Heatmap Zeilen werden dynamisch per Code befüllt -->
+                <LinearLayout
+                    android:id="@+id/heatmapGrid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+
+            <!-- Legende -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wenig "
+                    android:textSize="11sp"
+                    android:textColor="?attr/todoHintColor" />
+                <View android:layout_width="16dp" android:layout_height="16dp" android:background="#22CCFF00" android:layout_marginEnd="4dp"/>
+                <View android:layout_width="16dp" android:layout_height="16dp" android:background="#55CCFF00" android:layout_marginEnd="4dp"/>
+                <View android:layout_width="16dp" android:layout_height="16dp" android:background="#99CCFF00" android:layout_marginEnd="4dp"/>
+                <View android:layout_width="16dp" android:layout_height="16dp" android:background="#CCFF00" android:layout_marginEnd="8dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Viel"
+                    android:textSize="11sp"
+                    android:textColor="?attr/todoHintColor" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
