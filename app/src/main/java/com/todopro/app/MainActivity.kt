@@ -820,6 +820,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Ziel wurde heute bereits erreicht und Karte ist schon weg → nicht mehr anzeigen
+        if (TodoStorage.isGoalReachedToday(this)) {
+            goalCard.visibility = View.GONE
+            return
+        }
+
         val completedToday = TodoStorage.getCompletedToday(this)
         val percent = minOf((completedToday * 100) / goal, 100)
         val isReached = completedToday >= goal
