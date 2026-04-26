@@ -68,6 +68,17 @@
 
         </LinearLayout>
 
+        <!-- Archive Button -->
+        <ImageButton
+            android:id="@+id/btnArchive"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/btn_icon_bg"
+            android:src="@drawable/ic_restore"
+            android:contentDescription="Archiv"
+            android:padding="10dp"
+            android:layout_marginEnd="8dp" />
+
         <!-- Stats Button -->
         <ImageButton
             android:id="@+id/btnStats"

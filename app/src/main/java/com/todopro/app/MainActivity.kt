@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnNotifications: ImageButton
     private lateinit var btnHelp: ImageButton
     private lateinit var btnStats: ImageButton
+    private lateinit var btnArchive: ImageButton
     private lateinit var emptyView: LinearLayout
     private lateinit var konfettiView: KonfettiView
     private lateinit var tvSnackbar: TextView
@@ -111,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         btnNotifications = findViewById(R.id.btnNotifications)
         btnHelp = findViewById(R.id.btnHelp)
         btnStats = findViewById(R.id.btnStats)
+        btnArchive = findViewById(R.id.btnArchive)
         emptyView = findViewById(R.id.emptyView)
         konfettiView = findViewById(R.id.konfettiView)
         tvSnackbar = findViewById(R.id.tvSnackbar)
@@ -141,7 +143,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtonAnimations() {
-        listOf(btnAdd, btnTheme, btnNotifications, btnHelp, btnStats).forEach { btn ->
+        listOf(btnAdd, btnTheme, btnNotifications, btnHelp, btnStats, btnArchive).forEach { btn ->
             btn.setOnTouchListener { v, event ->
                 when (event.action) {
                     android.view.MotionEvent.ACTION_DOWN ->
@@ -177,6 +179,22 @@ class MainActivity : AppCompatActivity() {
                 todo.text = newText
                 todo.isPriority = newText.startsWith("!")
                 saveTodos()
+            },
+            onReminderSuggestion = { todo, suggestedTime ->
+                // Erinnerungsvorschlag direkt setzen
+                todo.reminderTime = suggestedTime
+                saveTodos()
+                AlarmScheduler.scheduleAlarm(this, todo)
+                adapter.notifyDataSetChanged()
+                val sdf = java.text.SimpleDateFormat("dd.MM. HH:mm", java.util.Locale.GERMAN)
+                showSnackbar("⏰ Erinnerung gesetzt: ${sdf.format(java.util.Date(suggestedTime))}")
+            },
+            onCategoryChanged = { todo ->
+                saveTodos()
+                val cat = try { TodoCategory.valueOf(todo.category) } catch (e: Exception) { TodoCategory.NONE }
+                if (cat != TodoCategory.NONE) {
+                    showSnackbar("${cat.emoji} Kategorie: ${cat.label}")
+                }
             }
         )
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -266,6 +284,12 @@ class MainActivity : AppCompatActivity() {
         btnHelp.setOnClickListener { showHelpDialog() }
         btnStats.setOnClickListener {
             val intent = Intent(this, StatsActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+        }
+
+        btnArchive.setOnClickListener {
+            val intent = Intent(this, ArchiveActivity::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
         }

@@ -49,6 +49,12 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Archiv-Activity -->
+        <activity
+            android:name=".ArchiveActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- BroadcastReceiver für Alarm-Benachrichtigungen -->
         <receiver
             android:name=".AlarmReceiver"
