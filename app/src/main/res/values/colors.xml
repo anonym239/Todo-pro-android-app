@@ -27,4 +27,8 @@
     <!-- Accent -->
     <color name="priority_red">#FF4444</color>
     <color name="complete_green">#4CAF50</color>
+
+    <!-- Splash -->
+    <color name="splash_bg">#0A0A0A</color>
+    <color name="splash_red">#E8194B</color>
 </resources>

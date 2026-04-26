@@ -19,15 +19,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoPro.Dark">
 
+        <!-- Splash Screen - startet zuerst -->
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:theme="@style/Theme.TodoPro.Splash"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Haupt-Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- BroadcastReceiver für Alarm-Benachrichtigungen -->
         <receiver
