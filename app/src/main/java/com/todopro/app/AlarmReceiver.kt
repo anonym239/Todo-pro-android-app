@@ -47,8 +47,13 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationText = if (isPriority) "🚨$cleanText🚨" else cleanText
         val notificationTitle = if (isPriority) "🚨 Wichtige Erinnerung!" else "⏰ TodoPro Erinnerung"
 
-        // Hinweis-Text: Wischen = Todo wird erledigt
-        val bigText = "$notificationText\n\n⚠️ Achtung: Nach dem Wegwischen wird diese Todo automatisch als erledigt markiert!"
+        // Zähler erhöhen – Warnung nur bei 1. und 2. Benachrichtigung
+        val notifCount = TodoStorage.incrementNotificationCount(context)
+        val bigText = if (notifCount <= 2) {
+            "$notificationText\n\n⚠️ Achtung: Nach dem Wegwischen wird diese Todo automatisch als erledigt markiert!"
+        } else {
+            notificationText
+        }
 
         val notifId = todoId.hashCode()
 
