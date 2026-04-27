@@ -60,9 +60,9 @@ class OnboardingActivity : AppCompatActivity() {
         OnboardingPage(
             icon = "⏰",
             title = "Erinnerungen & mehr",
-            description = "Tippe auf das Glocken-Symbol bei einer Aufgabe um eine Erinnerung zu setzen.\n\nWische eine Aufgabe nach links um sie zu löschen.",
-            highlightIcon = "🚀",
-            highlightText = "Du bist bereit! Viel Erfolg mit TodoPro."
+            description = "Tippe auf das Glocken-Symbol bei einer Aufgabe um eine Erinnerung zu setzen.\n\nWenn die Erinnerung kommt, öffne die App – die Aufgabe wartet auf dich.\n\nWische eine Aufgabe nach links um sie zu löschen.",
+            highlightIcon = "💡",
+            highlightText = "Tipp: In der Benachrichtigung steht (Wischen = Todo erledigt) – einfach in der App nach links wischen!"
         )
     )
 

@@ -47,11 +47,20 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationText = if (isPriority) "🚨$cleanText🚨" else cleanText
         val notificationTitle = if (isPriority) "🚨 Wichtige Erinnerung!" else "⏰ TodoPro Erinnerung"
 
+        // Beim ersten Alarm: Hinweis "(Wischen = Todo erledigt)" anhängen
+        val isFirstNotif = TodoStorage.isFirstNotification(context)
+        val bigText = if (isFirstNotif) {
+            TodoStorage.setFirstNotificationShown(context)
+            "$notificationText\n\n(Wischen = Todo erledigt – einfach in der App nach links wischen!)"
+        } else {
+            notificationText
+        }
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(notificationTitle)
             .setContentText(notificationText)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setSound(soundUri)

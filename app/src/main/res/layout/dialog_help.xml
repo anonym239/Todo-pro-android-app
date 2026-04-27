@@ -101,7 +101,7 @@
                     android:text="Erinnerung" android:textColor="@color/neon_yellow"
                     android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Klicke auf 🔔 neben dem Buch-Symbol einer Aufgabe, um eine Benachrichtigung zu planen – auch wenn die App geschlossen ist."
+                    android:text="Tippe auf 🔔 bei einer Aufgabe um eine Benachrichtigung zu planen – auch wenn die App geschlossen ist. In der Benachrichtigung steht (Wischen = Todo erledigt)."
                     android:textColor="#AAAAAA" android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -118,7 +118,7 @@
                     android:text="Abschließen" android:textColor="@color/neon_yellow"
                     android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Checkbox rechts anklicken – Aufgabe wird gelöscht. Alles erledigt? Konfetti!"
+                    android:text="Tippe auf den Haken links neben einer Aufgabe – sie wird als erledigt markiert. Alles erledigt? Konfetti!"
                     android:textColor="#AAAAAA" android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -135,7 +135,7 @@
                     android:text="Löschen" android:textColor="@color/neon_yellow"
                     android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="4dp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Das × anklicken, um eine Aufgabe sofort zu entfernen."
+                    android:text="Wische eine Aufgabe nach links um sie zu löschen. Mit Rückgängig-Funktion in der Snackbar."
                     android:textColor="#AAAAAA" android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
