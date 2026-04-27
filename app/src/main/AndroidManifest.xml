@@ -77,6 +77,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- BroadcastReceiver für "Erledigt"-Action in Benachrichtigungen -->
+        <receiver
+            android:name=".NotificationActionReceiver"
+            android:exported="false"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.todopro.app.ACTION_COMPLETE_TODO" />
+            </intent-filter>
+        </receiver>
+
         <!-- BroadcastReceiver für Neustart des Geräts -->
         <receiver
             android:name=".BootReceiver"

@@ -56,6 +56,18 @@ class AlarmReceiver : BroadcastReceiver() {
             notificationText
         }
 
+        // "Erledigt"-Action: Todo direkt aus der Benachrichtigung abhaken
+        val notifId = todoId.hashCode()
+        val completeIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = NotificationActionReceiver.ACTION_COMPLETE
+            putExtra(NotificationActionReceiver.EXTRA_TODO_ID, todoId)
+            putExtra(NotificationActionReceiver.EXTRA_NOTIF_ID, notifId)
+        }
+        val completePendingIntent = PendingIntent.getBroadcast(
+            context, notifId + 1, completeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(notificationTitle)
@@ -68,10 +80,15 @@ class AlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(pendingIntent, true)
+            .addAction(
+                android.R.drawable.checkbox_on_background,
+                "✅ Erledigt",
+                completePendingIntent
+            )
             .build()
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(todoId.hashCode(), notification)
+        notificationManager.notify(notifId, notification)
     }
 
     private fun createNotificationChannel(context: Context) {
