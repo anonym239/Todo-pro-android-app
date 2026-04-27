@@ -11,6 +11,7 @@ object TodoStorage {
     private const val KEY_TODOS = "todos"
     private const val KEY_COMPLETED_TODOS = "completed_todos"
     private const val KEY_DARK_MODE = "dark_mode"
+    private const val KEY_FIRST_LAUNCH_DONE = "first_launch_done"
     private const val KEY_COMPLIMENTS = "compliments_enabled"
     private const val KEY_KONFETTI = "konfetti_enabled"
     private const val KEY_NOTIFICATIONS = "notifications_enabled"
@@ -160,6 +161,16 @@ object TodoStorage {
 
     fun setDarkMode(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_DARK_MODE, enabled).apply()
+    }
+
+    /** Erster App-Start? (Onboarding noch nicht gesehen) */
+    fun isFirstLaunch(context: Context): Boolean {
+        return !getPrefs(context).getBoolean(KEY_FIRST_LAUNCH_DONE, false)
+    }
+
+    /** Onboarding als gesehen markieren */
+    fun setFirstLaunchDone(context: Context) {
+        getPrefs(context).edit().putBoolean(KEY_FIRST_LAUNCH_DONE, true).apply()
     }
 
     fun isComplimentsEnabled(context: Context): Boolean {

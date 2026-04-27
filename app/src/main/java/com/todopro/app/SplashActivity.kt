@@ -32,9 +32,15 @@ class SplashActivity : AppCompatActivity() {
         slideAnim2.startOffset = 500
         subText.startAnimation(slideAnim2)
 
-        // Nach 2 Sekunden zur MainActivity
+        // Nach 2 Sekunden: Onboarding (erster Start) oder direkt zur MainActivity
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
+            if (TodoStorage.isFirstLaunch(this)) {
+                // Erster Start → Onboarding zeigen
+                startActivity(Intent(this, OnboardingActivity::class.java))
+            } else {
+                // Bereits bekannt → direkt zur MainActivity
+                startActivity(Intent(this, MainActivity::class.java))
+            }
             overridePendingTransition(R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }, 2000)
