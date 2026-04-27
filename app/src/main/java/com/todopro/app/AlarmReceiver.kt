@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
-import android.os.Build
 import androidx.core.app.NotificationCompat
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -29,6 +28,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         createNotificationChannel(context)
 
+        // Tippen auf Notification → App öffnen
         val openIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra(EXTRA_TODO_ID, todoId)
@@ -47,24 +47,19 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationText = if (isPriority) "🚨$cleanText🚨" else cleanText
         val notificationTitle = if (isPriority) "🚨 Wichtige Erinnerung!" else "⏰ TodoPro Erinnerung"
 
-        // Beim ersten Alarm: Hinweis "(Wischen = Todo erledigt)" anhängen
-        val isFirstNotif = TodoStorage.isFirstNotification(context)
-        val bigText = if (isFirstNotif) {
-            TodoStorage.setFirstNotificationShown(context)
-            "$notificationText\n\n(Wischen = Todo erledigt – einfach in der App nach links wischen!)"
-        } else {
-            notificationText
-        }
+        // Hinweis-Text: Wischen = Todo wird erledigt
+        val bigText = "$notificationText\n\n⚠️ Achtung: Nach dem Wegwischen wird diese Todo automatisch als erledigt markiert!"
 
-        // "Erledigt"-Action: Todo direkt aus der Benachrichtigung abhaken
         val notifId = todoId.hashCode()
-        val completeIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+
+        // Wegwischen der Notification → Todo automatisch als erledigt markieren (deleteIntent)
+        val dismissIntent = Intent(context, NotificationActionReceiver::class.java).apply {
             action = NotificationActionReceiver.ACTION_COMPLETE
             putExtra(NotificationActionReceiver.EXTRA_TODO_ID, todoId)
             putExtra(NotificationActionReceiver.EXTRA_NOTIF_ID, notifId)
         }
-        val completePendingIntent = PendingIntent.getBroadcast(
-            context, notifId + 1, completeIntent,
+        val dismissPendingIntent = PendingIntent.getBroadcast(
+            context, notifId + 2, dismissIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -80,11 +75,8 @@ class AlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(pendingIntent, true)
-            .addAction(
-                android.R.drawable.checkbox_on_background,
-                "✅ Erledigt",
-                completePendingIntent
-            )
+            // Wenn Notification weggewischt wird → Todo erledigen
+            .setDeleteIntent(dismissPendingIntent)
             .build()
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
