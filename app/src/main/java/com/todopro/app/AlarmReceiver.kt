@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat
 class AlarmReceiver : BroadcastReceiver() {
 
     companion object {
-        const val CHANNEL_ID = "todopro_reminders"
+        const val CHANNEL_ID = "todopro_reminders_v2"
         const val EXTRA_TODO_ID = "todo_id"
         const val EXTRA_TODO_TEXT = "todo_text"
         const val EXTRA_IS_PRIORITY = "is_priority"
@@ -74,9 +74,11 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentText(notificationText)
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setSound(soundUri)
-            .setVibrate(longArrayOf(0, 500, 200, 500))
+            // Starkes Vibrationsmuster wie normale Apps (lang-kurz-lang)
+            .setVibrate(longArrayOf(0, 400, 200, 400, 200, 800))
+            .setDefaults(NotificationCompat.DEFAULT_SOUND or NotificationCompat.DEFAULT_LIGHTS)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(pendingIntent, true)
@@ -102,9 +104,11 @@ class AlarmReceiver : BroadcastReceiver() {
         ).apply {
             description = "Benachrichtigungen für TodoPro Aufgaben-Erinnerungen"
             enableVibration(true)
-            vibrationPattern = longArrayOf(0, 500, 200, 500)
+            // Starkes Vibrationsmuster: kurz-lang-kurz-lang-lang
+            vibrationPattern = longArrayOf(0, 400, 200, 400, 200, 800)
             setSound(soundUri, audioAttributes)
             lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+            enableLights(true)
         }
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
