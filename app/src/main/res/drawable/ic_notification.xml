@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Monochromes Notification-Icon: weißes Häkchen auf transparentem Hintergrund -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="110"
+    android:viewportHeight="110">
+
+    <!-- Weißes Häkchen (identisch mit App-Icon, aber ohne Hintergrund) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,58 C28,54 33,52 37,56 L48,68 L73,36 C77,31 83,30 87,34 C91,38 90,44 86,48 L52,82 C50,84 47,85 44,84 C41,83 39,81 38,79 L24,63 C22,60 23,61 26,58 Z" />
+
+</vector>
