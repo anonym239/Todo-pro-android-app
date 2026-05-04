@@ -63,4 +63,7 @@
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
+    <!-- Splash -->
+    <color name="splash_bg">#0A0A0A</color>
+    <color name="splash_red">#E8194B</color>
 </resources>

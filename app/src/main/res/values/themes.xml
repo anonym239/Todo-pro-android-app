@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- ═══ DARK THEME – Deep Space ════════════════════════════════════════ -->
+    <!-- DARK THEME - Deep Space -->
     <style name="Theme.TodoPro.Dark" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/neon_yellow</item>
         <item name="colorPrimaryVariant">@color/neon_yellow</item>
@@ -10,7 +10,6 @@
         <item name="android:navigationBarColor">@color/dark_bg</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowBackground">@color/dark_bg</item>
-        <!-- Custom attrs -->
         <item name="todoBgColor">@color/dark_bg</item>
         <item name="todoSurfaceColor">@color/dark_surface</item>
         <item name="todoTextColor">@color/dark_text</item>
@@ -26,7 +25,7 @@
         <item name="todoSearchBg">@color/dark_search_bg</item>
     </style>
 
-    <!-- ═══ LIGHT THEME – Clean Paper ══════════════════════════════════════ -->
+    <!-- LIGHT THEME - Clean Paper -->
     <style name="Theme.TodoPro.Light" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryVariant">@color/black</item>
@@ -35,7 +34,6 @@
         <item name="android:navigationBarColor">@color/light_bg</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/light_bg</item>
-        <!-- Custom attrs -->
         <item name="todoBgColor">@color/light_bg</item>
         <item name="todoSurfaceColor">@color/light_surface</item>
         <item name="todoTextColor">@color/light_text</item>
@@ -49,6 +47,21 @@
         <item name="todoChipBg">@color/light_chip_bg</item>
         <item name="todoChipSelected">@color/light_chip_selected</item>
         <item name="todoSearchBg">@color/light_search_bg</item>
+    </style>
+
+    <!-- SPLASH THEME -->
+    <style name="Theme.TodoPro.Splash" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">@color/splash_bg</item>
+        <item name="android:statusBarColor">@color/splash_bg</item>
+        <item name="android:navigationBarColor">@color/splash_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- DIALOG THEME -->
+    <style name="ReminderDialogTheme" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
 </resources>
