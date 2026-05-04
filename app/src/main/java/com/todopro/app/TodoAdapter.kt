@@ -1,12 +1,11 @@
 package com.todopro.app
 
-import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.EditText
 import android.widget.ImageButton
@@ -29,291 +28,285 @@ class TodoAdapter(
     private val onCategoryChanged: ((TodoItem) -> Unit)? = null
 ) : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
 
+    // ── Filter-State ────────────────────────────────────────────────────────
+    private var searchQuery: String = ""
+    private var filterCategory: TodoCategory = TodoCategory.NONE
+
+    private val displayList: MutableList<TodoItem>
+        get() {
+            var list = todos.toList()
+            if (searchQuery.isNotBlank()) {
+                val q = searchQuery.lowercase()
+                list = list.filter { it.text.lowercase().contains(q) }
+            }
+            if (filterCategory != TodoCategory.NONE) {
+                list = list.filter { it.category == filterCategory.name }
+            }
+            return list.toMutableList()
+        }
+
+    fun setSearchQuery(query: String) { searchQuery = query; notifyDataSetChanged() }
+    fun setFilter(category: TodoCategory) { filterCategory = category; notifyDataSetChanged() }
+
+    // ── ViewHolder ──────────────────────────────────────────────────────────
     inner class TodoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val editText: EditText = view.findViewById(R.id.editTodoText)
-        val btnComplete: ImageButton = view.findViewById(R.id.btnComplete)
-        val btnReminder: ImageButton = view.findViewById(R.id.btnReminder)
-        val tvReminderTime: TextView = view.findViewById(R.id.tvReminderTime)
-        val tvCreatedDate: TextView = view.findViewById(R.id.tvCreatedDate)
-        val tvCategoryBadge: TextView = view.findViewById(R.id.tvCategoryBadge)
-        val tvReminderSuggestion: TextView = view.findViewById(R.id.tvReminderSuggestion)
-        val cardContent: LinearLayout = view.findViewById(R.id.cardContent)
-        val priorityBar: View = view.findViewById(R.id.priorityBar)
-        val categoryBar: View = view.findViewById(R.id.categoryBar)
-        val root: View = view.findViewById(R.id.todoItemRoot)
+        val editText: EditText             = view.findViewById(R.id.editTodoText)
+        val btnComplete: ImageButton       = view.findViewById(R.id.btnComplete)
+        val btnReminder: ImageButton       = view.findViewById(R.id.btnReminder)
+        val tvReminderTime: TextView       = view.findViewById(R.id.tvReminderTime)
+        val tvCreatedDate: TextView        = view.findViewById(R.id.tvCreatedDate)
+        val tvCategoryBadge: TextView      = view.findViewById(R.id.tvCategoryBadge)
+        val tvReminderSugg: TextView       = view.findViewById(R.id.tvReminderSuggestion)
+        val tvSubtaskCount: TextView       = view.findViewById(R.id.tvSubtaskCount)
+        val cardContent: LinearLayout      = view.findViewById(R.id.cardContent)
+        val categoryBadgeRow: LinearLayout = view.findViewById(R.id.categoryBadgeRow)
+        val priorityBar: View              = view.findViewById(R.id.priorityBar)
+        val categoryBar: View              = view.findViewById(R.id.categoryBar)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_todo, parent, false)
-        return TodoViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TodoViewHolder(
+        LayoutInflater.from(parent.context).inflate(R.layout.item_todo, parent, false)
+    )
+
+    override fun getItemCount() = displayList.size
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
-        val todo = todos[position]
+        bindTodo(holder, displayList[position])
+    }
 
-        // Slide-in animation
-        val slideIn = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.fade_in)
-        holder.itemView.startAnimation(slideIn)
+    // ── Bind ────────────────────────────────────────────────────────────────
+    private fun bindTodo(holder: TodoViewHolder, todo: TodoItem) {
 
-        // Text setzen ohne TextWatcher
+        // Text
         holder.editText.removeTextChangedListener(holder.editText.tag as? TextWatcher)
-        val displayText = if (todo.isPriority && todo.text.startsWith("!")) {
-            todo.text.removePrefix("!").trimStart()
-        } else {
-            todo.text
-        }
+        val displayText = if (todo.isPriority && todo.text.startsWith("!"))
+            todo.text.removePrefix("!").trimStart() else todo.text
         holder.editText.setText(displayText)
-        holder.editText.setSelection(holder.editText.text.length)
+        holder.editText.setSelection(displayText.length)
 
-        // Prioritäts-Streifen
+        // Priority bar
         holder.priorityBar.visibility = if (todo.isPriority) View.VISIBLE else View.GONE
 
-        // Kategorie-Streifen + Badge
-        val category = try { TodoCategory.valueOf(todo.category) } catch (e: Exception) { TodoCategory.NONE }
+        // Category
+        val category = try { TodoCategory.valueOf(todo.category) } catch (_: Exception) { TodoCategory.NONE }
         if (category != TodoCategory.NONE) {
             holder.categoryBar.visibility = View.VISIBLE
             holder.categoryBar.setBackgroundColor(category.color)
-            holder.tvCategoryBadge.visibility = View.VISIBLE
+            holder.categoryBadgeRow.visibility = View.VISIBLE
             holder.tvCategoryBadge.text = "${category.emoji} ${category.label}"
+            holder.tvCategoryBadge.setTextColor(category.color)
         } else {
             holder.categoryBar.visibility = View.GONE
-            holder.tvCategoryBadge.visibility = View.GONE
+            holder.categoryBadgeRow.visibility = View.GONE
         }
 
-        // Reminder-Zeit anzeigen
+        // Subtask badge
+        if (todo.subtasks.isNotEmpty()) {
+            val done = todo.subtasksDone.count { it }
+            holder.tvSubtaskCount.text = "◾ $done/${todo.subtasks.size}"
+            holder.tvSubtaskCount.visibility = View.VISIBLE
+            holder.categoryBadgeRow.visibility = View.VISIBLE
+        } else {
+            holder.tvSubtaskCount.visibility = View.GONE
+        }
+
+        // Reminder
         if (todo.reminderTime != null) {
             val sdf = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMAN)
             holder.tvReminderTime.text = "⏰ ${sdf.format(Date(todo.reminderTime!!))}"
             holder.tvReminderTime.visibility = View.VISIBLE
-            holder.btnReminder.setImageResource(R.drawable.ic_bell_active)
+            holder.btnReminder.alpha = 1f
         } else {
             holder.tvReminderTime.visibility = View.GONE
-            holder.btnReminder.setImageResource(R.drawable.ic_bell)
+            holder.btnReminder.alpha = 0.45f
         }
 
-        // Erstellungsdatum
-        val sdfDate = SimpleDateFormat("d.M.yy", Locale.GERMAN)
-        holder.tvCreatedDate.text = sdfDate.format(Date(todo.createdAt))
+        // Created date
+        holder.tvCreatedDate.text = SimpleDateFormat("d.M.", Locale.GERMAN).format(Date(todo.createdAt))
 
-        // Erinnerungsvorschlag prüfen
+        // Reminder suggestion
         checkReminderSuggestion(holder, todo)
 
         // TextWatcher
         val watcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
+            override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 val typed = s?.toString() ?: ""
                 if (typed.startsWith("!")) {
-                    val cleanText = typed.removePrefix("!").trimStart()
-                    todo.isPriority = true
-                    todo.text = "!$cleanText"
-                    onTextChanged(todo, "!$cleanText")
+                    val clean = typed.removePrefix("!").trimStart()
+                    todo.isPriority = true; todo.text = "!$clean"
+                    onTextChanged(todo, "!$clean")
                     holder.editText.removeTextChangedListener(this)
-                    holder.editText.setText(cleanText)
-                    holder.editText.setSelection(cleanText.length)
+                    holder.editText.setText(clean); holder.editText.setSelection(clean.length)
                     holder.editText.addTextChangedListener(this)
                     holder.priorityBar.visibility = View.VISIBLE
                 } else {
-                    todo.isPriority = false
-                    todo.text = typed
+                    todo.isPriority = false; todo.text = typed
                     onTextChanged(todo, typed)
                     holder.priorityBar.visibility = View.GONE
+                    // Auto-Kategorisierung (nur wenn noch keine Kategorie gesetzt)
+                    if (todo.category == TodoCategory.NONE.name && typed.length >= 4) {
+                        val detected = AutoCategory.detect(typed)
+                        if (detected != TodoCategory.NONE) {
+                            todo.category = detected.name
+                            onCategoryChanged?.invoke(todo)
+                            holder.categoryBar.setBackgroundColor(detected.color)
+                            holder.categoryBar.visibility = View.VISIBLE
+                            holder.tvCategoryBadge.text = "${detected.emoji} ${detected.label}"
+                            holder.tvCategoryBadge.setTextColor(detected.color)
+                            if (holder.categoryBadgeRow.visibility != View.VISIBLE) {
+                                holder.categoryBadgeRow.alpha = 0f
+                                holder.categoryBadgeRow.visibility = View.VISIBLE
+                                holder.categoryBadgeRow.animate().alpha(1f).setDuration(300).start()
+                            }
+                        }
+                    }
                 }
-                // Erinnerungsvorschlag live aktualisieren
                 checkReminderSuggestion(holder, todo)
             }
         }
         holder.editText.tag = watcher
         holder.editText.addTextChangedListener(watcher)
 
-        // Erinnerungsvorschlag antippen → Erinnerung setzen
-        holder.tvReminderSuggestion.setOnClickListener {
-            val suggestedTime = parseSuggestedTime(todo.text)
-            if (suggestedTime != null) {
-                onReminderSuggestion?.invoke(todo, suggestedTime)
-                holder.tvReminderSuggestion.visibility = View.GONE
-                // Kurze Bestätigungs-Animation
-                holder.tvReminderSuggestion.animate()
-                    .scaleX(1.1f).scaleY(1.1f).setDuration(100)
-                    .withEndAction {
-                        holder.tvReminderSuggestion.animate()
-                            .scaleX(1f).scaleY(1f).setDuration(100).start()
-                    }.start()
-            }
+        // Reminder suggestion tap
+        holder.tvReminderSugg.setOnClickListener {
+            val t = parseSuggestedTime(todo.text)
+            if (t != null) { onReminderSuggestion?.invoke(todo, t); holder.tvReminderSugg.visibility = View.GONE }
         }
 
-        // Langer Druck → Kategorie auswählen
-        holder.cardContent.setOnLongClickListener {
-            showCategoryPicker(holder, todo)
-            true
-        }
+        // Long press → context menu
+        holder.cardContent.setOnLongClickListener { showContextMenu(holder, todo); true }
 
-        // Complete button
+        // Complete
         holder.btnComplete.setOnClickListener {
             holder.btnComplete.isEnabled = false
-            holder.btnComplete.animate()
-                .scaleX(1.3f).scaleY(1.3f).setDuration(120)
+            holder.btnComplete.animate().scaleX(1.35f).scaleY(1.35f).setDuration(100)
                 .withEndAction {
-                    holder.btnComplete.animate()
-                        .scaleX(1f).scaleY(1f).setDuration(80)
+                    holder.btnComplete.animate().scaleX(1f).scaleY(1f).setDuration(80)
                         .withEndAction {
-                            val slideRight = AnimationUtils.loadAnimation(
-                                holder.itemView.context, R.anim.slide_right_out
-                            )
-                            slideRight.fillAfter = true
-                            holder.cardContent.startAnimation(slideRight)
-                            holder.cardContent.postDelayed({ onComplete(todo) }, 360)
+                            holder.cardContent.animate()
+                                .translationX(holder.cardContent.width.toFloat() + 100f)
+                                .alpha(0f).setDuration(280)
+                                .setInterpolator(DecelerateInterpolator())
+                                .withEndAction { onComplete(todo) }.start()
                         }.start()
                 }.start()
         }
 
         // Reminder button
         holder.btnReminder.setOnClickListener {
-            holder.btnReminder.animate()
-                .scaleX(0.85f).scaleY(0.85f).setDuration(80)
+            holder.btnReminder.animate().scaleX(0.8f).scaleY(0.8f).setDuration(80)
                 .withEndAction {
-                    holder.btnReminder.animate()
-                        .scaleX(1f).scaleY(1f).setDuration(120)
-                        .setInterpolator(OvershootInterpolator())
-                        .start()
+                    holder.btnReminder.animate().scaleX(1f).scaleY(1f).setDuration(120)
+                        .setInterpolator(OvershootInterpolator()).start()
                 }.start()
             onReminderClick(todo)
         }
     }
 
-    // Erinnerungsvorschlag: Zeitwörter im Text erkennen
+    // ── Smart Reminder-Vorschlag ────────────────────────────────────────────
     private fun checkReminderSuggestion(holder: TodoViewHolder, todo: TodoItem) {
-        // Kein Vorschlag wenn schon eine Erinnerung gesetzt ist
-        if (todo.reminderTime != null) {
-            holder.tvReminderSuggestion.visibility = View.GONE
-            return
-        }
-
-        val suggestedTime = parseSuggestedTime(todo.text)
-        if (suggestedTime != null) {
-            val sdf = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMAN)
-            holder.tvReminderSuggestion.text = "💡 Erinnerung: ${sdf.format(Date(suggestedTime))} tippen"
-            holder.tvReminderSuggestion.visibility = View.VISIBLE
+        if (todo.reminderTime != null) { holder.tvReminderSugg.visibility = View.GONE; return }
+        val t = parseSuggestedTime(todo.text)
+        if (t != null) {
+            holder.tvReminderSugg.text = "⏰ ${SimpleDateFormat("dd.MM. HH:mm", Locale.GERMAN).format(Date(t))} — tippe"
+            holder.tvReminderSugg.visibility = View.VISIBLE
         } else {
-            holder.tvReminderSuggestion.visibility = View.GONE
+            holder.tvReminderSugg.visibility = View.GONE
         }
     }
 
-    // Zeitwörter parsen und Timestamp zurückgeben
+    // ── Zeit-Parser ─────────────────────────────────────────────────────────
     fun parseSuggestedTime(text: String): Long? {
         val lower = text.lowercase(Locale.GERMAN)
         val cal = Calendar.getInstance()
-
-        // "um HH:mm" oder "um HH Uhr"
-        val timePattern = Regex("""um\s+(\d{1,2})(?::(\d{2}))?\s*uhr?""")
-        val timeMatch = timePattern.find(lower)
-        if (timeMatch != null) {
-            val hour = timeMatch.groupValues[1].toIntOrNull() ?: return null
-            val minute = timeMatch.groupValues[2].toIntOrNull() ?: 0
-            cal.set(Calendar.HOUR_OF_DAY, hour)
-            cal.set(Calendar.MINUTE, minute)
-            cal.set(Calendar.SECOND, 0)
-
-            // Wenn Zeit in der Vergangenheit → morgen
-            if (cal.timeInMillis <= System.currentTimeMillis()) {
-                cal.add(Calendar.DAY_OF_YEAR, 1)
-            }
-
-            // "morgen um X" → +1 Tag
-            if (lower.contains("morgen")) {
-                cal.add(Calendar.DAY_OF_YEAR, 1)
-            }
+        Regex("""um\s+(\d{1,2})(?::(\d{2}))?\s*uhr?""").find(lower)?.let { m ->
+            val h = m.groupValues[1].toIntOrNull() ?: return null
+            val min = m.groupValues[2].toIntOrNull() ?: 0
+            cal.set(Calendar.HOUR_OF_DAY, h); cal.set(Calendar.MINUTE, min); cal.set(Calendar.SECOND, 0)
+            if (cal.timeInMillis <= System.currentTimeMillis()) cal.add(Calendar.DAY_OF_YEAR, 1)
+            if (lower.contains("morgen")) cal.add(Calendar.DAY_OF_YEAR, 1)
             return cal.timeInMillis
         }
-
-        // "morgen" ohne Uhrzeit → morgen 9 Uhr
         if (lower.contains("morgen")) {
-            cal.add(Calendar.DAY_OF_YEAR, 1)
-            cal.set(Calendar.HOUR_OF_DAY, 9)
-            cal.set(Calendar.MINUTE, 0)
-            cal.set(Calendar.SECOND, 0)
+            cal.add(Calendar.DAY_OF_YEAR, 1); cal.set(Calendar.HOUR_OF_DAY, 9); cal.set(Calendar.MINUTE, 0); cal.set(Calendar.SECOND, 0)
             return cal.timeInMillis
         }
-
-        // "heute" → heute in 1 Stunde
         if (lower.contains("heute")) {
-            cal.add(Calendar.HOUR_OF_DAY, 1)
-            cal.set(Calendar.MINUTE, 0)
-            cal.set(Calendar.SECOND, 0)
+            cal.add(Calendar.HOUR_OF_DAY, 1); cal.set(Calendar.MINUTE, 0); cal.set(Calendar.SECOND, 0)
             return cal.timeInMillis
         }
-
-        // "in X minuten/stunden"
-        val inMinPattern = Regex("""in\s+(\d+)\s*min""")
-        val inMinMatch = inMinPattern.find(lower)
-        if (inMinMatch != null) {
-            val minutes = inMinMatch.groupValues[1].toLongOrNull() ?: return null
-            return System.currentTimeMillis() + minutes * 60 * 1000
-        }
-
-        val inHourPattern = Regex("""in\s+(\d+)\s*stund""")
-        val inHourMatch = inHourPattern.find(lower)
-        if (inHourMatch != null) {
-            val hours = inHourMatch.groupValues[1].toLongOrNull() ?: return null
-            return System.currentTimeMillis() + hours * 60 * 60 * 1000
-        }
-
-        // Wochentage
-        val weekdays = mapOf(
-            "montag" to Calendar.MONDAY, "dienstag" to Calendar.TUESDAY,
-            "mittwoch" to Calendar.WEDNESDAY, "donnerstag" to Calendar.THURSDAY,
-            "freitag" to Calendar.FRIDAY, "samstag" to Calendar.SATURDAY,
-            "sonntag" to Calendar.SUNDAY
-        )
+        Regex("""in\s+(\d+)\s*min""").find(lower)?.let { return System.currentTimeMillis() + (it.groupValues[1].toLongOrNull() ?: return null) * 60_000 }
+        Regex("""in\s+(\d+)\s*stund""").find(lower)?.let { return System.currentTimeMillis() + (it.groupValues[1].toLongOrNull() ?: return null) * 3_600_000 }
+        val weekdays = mapOf("montag" to Calendar.MONDAY,"dienstag" to Calendar.TUESDAY,"mittwoch" to Calendar.WEDNESDAY,"donnerstag" to Calendar.THURSDAY,"freitag" to Calendar.FRIDAY,"samstag" to Calendar.SATURDAY,"sonntag" to Calendar.SUNDAY)
         for ((day, calDay) in weekdays) {
             if (lower.contains(day)) {
-                val today = cal.get(Calendar.DAY_OF_WEEK)
-                var daysUntil = calDay - today
-                if (daysUntil <= 0) daysUntil += 7
-                cal.add(Calendar.DAY_OF_YEAR, daysUntil)
-                cal.set(Calendar.HOUR_OF_DAY, 9)
-                cal.set(Calendar.MINUTE, 0)
-                cal.set(Calendar.SECOND, 0)
+                var d = calDay - cal.get(Calendar.DAY_OF_WEEK); if (d <= 0) d += 7
+                cal.add(Calendar.DAY_OF_YEAR, d); cal.set(Calendar.HOUR_OF_DAY, 9); cal.set(Calendar.MINUTE, 0); cal.set(Calendar.SECOND, 0)
                 return cal.timeInMillis
             }
         }
-
         return null
     }
 
-    // Kategorie-Auswahl Dialog
-    private fun showCategoryPicker(holder: TodoViewHolder, todo: TodoItem) {
-        val context = holder.itemView.context
-        val categories = TodoCategory.values()
-        val items = categories.map { cat ->
-            if (cat == TodoCategory.NONE) "❌ Keine Kategorie"
-            else "${cat.emoji} ${cat.label}"
-        }.toTypedArray()
-
-        AlertDialog.Builder(context)
-            .setTitle("Kategorie wählen")
-            .setItems(items) { _, which ->
-                val selected = categories[which]
-                todo.category = selected.name
-                onCategoryChanged?.invoke(todo)
-
-                // Kategorie-Badge animiert einblenden
-                if (selected != TodoCategory.NONE) {
-                    holder.tvCategoryBadge.text = "${selected.emoji} ${selected.label}"
-                    holder.tvCategoryBadge.alpha = 0f
-                    holder.tvCategoryBadge.visibility = View.VISIBLE
-                    holder.tvCategoryBadge.animate().alpha(1f).setDuration(300).start()
-                    holder.categoryBar.visibility = View.VISIBLE
-                    holder.categoryBar.setBackgroundColor(selected.color)
-                } else {
-                    holder.tvCategoryBadge.visibility = View.GONE
-                    holder.categoryBar.visibility = View.GONE
+    // ── Context Menu ─────────────────────────────────────────────────────────
+    private fun showContextMenu(holder: TodoViewHolder, todo: TodoItem) {
+        val ctx = holder.itemView.context
+        val options = arrayOf(
+            "📂  Kategorie wählen",
+            "📝  Subtask hinzufügen",
+            if (todo.isPriority) "⬇️  Priorität entfernen" else "⬆️  Als Priorität markieren"
+        )
+        AlertDialog.Builder(ctx).setItems(options) { _, which ->
+            when (which) {
+                0 -> showCategoryPicker(holder, todo)
+                1 -> showSubtaskInput(holder, todo)
+                2 -> {
+                    todo.isPriority = !todo.isPriority
+                    todo.text = if (todo.isPriority) "!${todo.text.trimStart('!').trimStart()}"
+                    else todo.text.removePrefix("!").trimStart()
+                    onTextChanged(todo, todo.text)
+                    holder.priorityBar.visibility = if (todo.isPriority) View.VISIBLE else View.GONE
                 }
             }
-            .show()
+        }.show()
     }
 
-    override fun getItemCount() = todos.size
+    private fun showCategoryPicker(holder: TodoViewHolder, todo: TodoItem) {
+        val ctx = holder.itemView.context
+        val cats = TodoCategory.values()
+        val items = cats.map { if (it == TodoCategory.NONE) "❌  Keine" else "${it.emoji}  ${it.label}" }.toTypedArray()
+        AlertDialog.Builder(ctx).setTitle("Kategorie wählen").setItems(items) { _, which ->
+            val sel = cats[which]; todo.category = sel.name; onCategoryChanged?.invoke(todo)
+            if (sel != TodoCategory.NONE) {
+                holder.tvCategoryBadge.text = "${sel.emoji} ${sel.label}"
+                holder.tvCategoryBadge.setTextColor(sel.color)
+                holder.tvCategoryBadge.alpha = 0f; holder.tvCategoryBadge.visibility = View.VISIBLE
+                holder.tvCategoryBadge.animate().alpha(1f).setDuration(300).start()
+                holder.categoryBadgeRow.visibility = View.VISIBLE
+                holder.categoryBar.visibility = View.VISIBLE; holder.categoryBar.setBackgroundColor(sel.color)
+            } else {
+                holder.tvCategoryBadge.visibility = View.GONE
+                holder.categoryBar.visibility = View.GONE; holder.categoryBadgeRow.visibility = View.GONE
+            }
+        }.show()
+    }
+
+    private fun showSubtaskInput(holder: TodoViewHolder, todo: TodoItem) {
+        val ctx = holder.itemView.context
+        val input = EditText(ctx).apply { hint = "Subtask eingeben…"; setPadding(50, 24, 50, 24) }
+        AlertDialog.Builder(ctx).setTitle("Subtask hinzufügen").setView(input)
+            .setPositiveButton("Hinzufügen") { _, _ ->
+                val t = input.text.toString().trim()
+                if (t.isNotEmpty()) {
+                    todo.subtasks.add(t); todo.subtasksDone.add(false)
+                    onTextChanged(todo, todo.text)
+                    val done = todo.subtasksDone.count { it }
+                    holder.tvSubtaskCount.text = "◾ $done/${todo.subtasks.size}"
+                    holder.tvSubtaskCount.visibility = View.VISIBLE
+                    holder.categoryBadgeRow.visibility = View.VISIBLE
+                }
+            }.setNegativeButton("Abbrechen", null).show()
+    }
 }

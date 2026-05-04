@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="todoBgColor" format="color" />
-    <attr name="todoSurfaceColor" format="color" />
-    <attr name="todoTextColor" format="color" />
-    <attr name="todoHintColor" format="color" />
-    <attr name="todoDividerColor" format="color" />
+    <attr name="todoBgColor"         format="color" />
+    <attr name="todoSurfaceColor"    format="color" />
+    <attr name="todoTextColor"       format="color" />
+    <attr name="todoTextSecondary"   format="color" />
+    <attr name="todoHintColor"       format="color" />
+    <attr name="todoDividerColor"    format="color" />
     <attr name="todoEmptyTitleColor" format="color" />
-    <attr name="todoCardColor" format="color" />
-    <attr name="todoInputColor" format="color" />
+    <attr name="todoCardColor"       format="color" />
+    <attr name="todoCardElevated"    format="color" />
+    <attr name="todoInputColor"      format="color" />
+    <attr name="todoChipBg"          format="color" />
+    <attr name="todoChipSelected"    format="color" />
+    <attr name="todoSearchBg"        format="color" />
 </resources>

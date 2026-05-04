@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Dark Theme -->
+    <!-- ═══ DARK THEME – Deep Space ════════════════════════════════════════ -->
     <style name="Theme.TodoPro.Dark" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/neon_yellow</item>
         <item name="colorPrimaryVariant">@color/neon_yellow</item>
@@ -14,14 +14,19 @@
         <item name="todoBgColor">@color/dark_bg</item>
         <item name="todoSurfaceColor">@color/dark_surface</item>
         <item name="todoTextColor">@color/dark_text</item>
+        <item name="todoTextSecondary">@color/dark_text_secondary</item>
         <item name="todoHintColor">@color/dark_hint</item>
         <item name="todoDividerColor">@color/dark_divider</item>
         <item name="todoEmptyTitleColor">@color/neon_yellow</item>
         <item name="todoCardColor">@color/dark_card</item>
+        <item name="todoCardElevated">@color/dark_card_elevated</item>
         <item name="todoInputColor">@color/dark_input</item>
+        <item name="todoChipBg">@color/dark_chip_bg</item>
+        <item name="todoChipSelected">@color/dark_chip_selected</item>
+        <item name="todoSearchBg">@color/dark_search_bg</item>
     </style>
 
-    <!-- Light Theme -->
+    <!-- ═══ LIGHT THEME – Clean Paper ══════════════════════════════════════ -->
     <style name="Theme.TodoPro.Light" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryVariant">@color/black</item>
@@ -34,26 +39,16 @@
         <item name="todoBgColor">@color/light_bg</item>
         <item name="todoSurfaceColor">@color/light_surface</item>
         <item name="todoTextColor">@color/light_text</item>
+        <item name="todoTextSecondary">@color/light_text_secondary</item>
         <item name="todoHintColor">@color/light_hint</item>
         <item name="todoDividerColor">@color/light_divider</item>
         <item name="todoEmptyTitleColor">@color/light_text</item>
         <item name="todoCardColor">@color/light_card</item>
+        <item name="todoCardElevated">@color/light_card_elevated</item>
         <item name="todoInputColor">@color/light_input</item>
-    </style>
-
-    <!-- Dialog Theme -->
-    <style name="ReminderDialogTheme" parent="Theme.MaterialComponents.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowSoftInputMode">adjustResize</item>
-    </style>
-
-    <!-- Splash Theme -->
-    <style name="Theme.TodoPro.Splash" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="android:windowBackground">@color/splash_bg</item>
-        <item name="android:statusBarColor">@color/splash_bg</item>
-        <item name="android:navigationBarColor">@color/splash_bg</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="todoChipBg">@color/light_chip_bg</item>
+        <item name="todoChipSelected">@color/light_chip_selected</item>
+        <item name="todoSearchBg">@color/light_search_bg</item>
     </style>
 
 </resources>

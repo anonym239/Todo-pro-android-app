@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -28,63 +28,53 @@ class OnboardingActivity : AppCompatActivity() {
     private lateinit var btnNext: TextView
     private lateinit var btnSkip: TextView
 
+    // ── 4 hochwertige, verkaufsorientierte Slides ──────────────────────────
     private val pages = listOf(
         OnboardingPage(
             icon = "✦",
-            title = "Willkommen bei\nTODOPRO",
-            description = "Deine smarte To-Do App.\nOrganisiere deinen Tag – einfach, schnell und stylisch.",
+            title = "Willkommen bei\nTODO PRO",
+            description = "Die smarte To-Do App, die dich wirklich produktiv macht — elegant, schnell und immer einen Schritt voraus.",
+            highlightIcon = "🚀",
+            highlightText = "Keine langen Tutorials. Einfach loslegen — in 30 Sekunden."
+        ),
+        OnboardingPage(
+            icon = "⚡",
+            title = "Blitzschnell\nAufgaben erfassen",
+            description = "Tippe deine Aufgabe ein und bestätige mit dem +-Button.\n\nSchreibe ! am Anfang für eine Prioritäts-Aufgabe — die immer ganz oben bleibt.",
             highlightIcon = "💡",
-            highlightText = "Wische durch die Seiten um alles zu entdecken."
+            highlightText = "Smart: Schreibe z. B. \"Arzt morgen um 10 Uhr\" — TodoPro erkennt die Zeit automatisch."
         ),
         OnboardingPage(
-            icon = "✏️",
-            title = "Aufgaben hinzufügen",
-            description = "Tippe oben in das Eingabefeld und drücke den Haken-Button.\n\nMit einem ! am Anfang wird die Aufgabe als Priorität markiert.",
-            highlightIcon = "⭐",
-            highlightText = "Tipp: Schreibe !Wichtige Aufgabe für Priorität."
-        ),
-        OnboardingPage(
-            icon = "✅",
-            title = "Aufgaben erledigen",
-            description = "Tippe auf den Haken links neben einer Aufgabe um sie als erledigt zu markieren.\n\nSie wird ins Archiv verschoben und dein Streak wächst!",
-            highlightIcon = "🔥",
-            highlightText = "Erledige täglich Aufgaben für einen langen Streak."
-        ),
-        OnboardingPage(
-            icon = "☰",
-            title = "Das Menü",
-            description = "Tippe oben rechts auf die drei Striche um das Menü zu öffnen.\n\n• Statistiken – deine Fortschritte\n• Archiv – erledigte Aufgaben\n• Tagesziel – setze dir ein Ziel\n• Monats-Rückblick – Heatmap\n• Dark / Light Mode",
+            icon = "🔥",
+            title = "Baue Gewohnheiten\nmit Streaks auf",
+            description = "Erledige täglich Aufgaben und halte deinen Streak am Leben.\n\nSuche & filtere nach Kategorien, setze Tagesziele und behalte den Überblick mit der Monats-Heatmap.",
             highlightIcon = "🎯",
-            highlightText = "Setze dir ein Tagesziel für extra Motivation!"
+            highlightText = "7-Tage-Streak = besondere Belohnung. Schaffst du es?"
         ),
         OnboardingPage(
             icon = "⏰",
-            title = "Erinnerungen & mehr",
-            description = "Tippe auf das Glocken-Symbol bei einer Aufgabe um eine Erinnerung zu setzen.\n\nWenn die Erinnerung kommt, öffne die App – die Aufgabe wartet auf dich.\n\nWische eine Aufgabe nach links um sie zu löschen.",
-            highlightIcon = "💡",
-            highlightText = "Tipp: In der Benachrichtigung steht (Wischen = Todo erledigt) – einfach in der App nach links wischen!"
+            title = "Nie wieder\netwas vergessen",
+            description = "Tippe auf die Glocke einer Aufgabe, um eine präzise Erinnerung zu setzen.\n\nWische links = löschen · Wische rechts = sofort erledigen.",
+            highlightIcon = "✅",
+            highlightText = "Alle deine Daten bleiben lokal auf deinem Gerät — komplett offline."
         )
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Theme anwenden
-        val isDark = TodoStorage.isDarkMode(this)
-        if (isDark) setTheme(R.style.Theme_TodoPro_Dark)
-        else setTheme(R.style.Theme_TodoPro_Light)
-
+        setTheme(R.style.Theme_TodoPro_Dark)
         setContentView(R.layout.activity_onboarding)
 
-        viewPager = findViewById(R.id.viewPager)
+        viewPager  = findViewById(R.id.viewPager)
         dotsLayout = findViewById(R.id.dotsLayout)
-        btnNext = findViewById(R.id.btnNext)
-        btnSkip = findViewById(R.id.btnSkip)
+        btnNext    = findViewById(R.id.btnNext)
+        btnSkip    = findViewById(R.id.btnSkip)
 
         viewPager.adapter = OnboardingAdapter(pages)
         viewPager.offscreenPageLimit = 1
 
         setupDots(0)
+        updateButtons(0)
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -101,50 +91,48 @@ class OnboardingActivity : AppCompatActivity() {
                 finishOnboarding()
             }
         }
-
-        btnSkip.setOnClickListener {
-            finishOnboarding()
-        }
+        btnSkip.setOnClickListener { finishOnboarding() }
     }
 
+    // ── Dot-Indicator ──────────────────────────────────────────────────────
     private fun setupDots(selectedIndex: Int) {
         dotsLayout.removeAllViews()
-        val density = resources.displayMetrics.density
+        val dp = resources.displayMetrics.density
 
         for (i in pages.indices) {
+            val isSelected = i == selectedIndex
             val dot = View(this)
-            val size = if (i == selectedIndex) (10 * density).toInt() else (7 * density).toInt()
-            val params = LinearLayout.LayoutParams(size, size)
-            params.setMargins((5 * density).toInt(), 0, (5 * density).toInt(), 0)
+            val w = if (isSelected) (24 * dp).toInt() else (8 * dp).toInt()
+            val h = (8 * dp).toInt()
+            val params = LinearLayout.LayoutParams(w, h)
+            params.setMargins((4 * dp).toInt(), 0, (4 * dp).toInt(), 0)
             dot.layoutParams = params
 
-            // Runde Dots via background
             val bg = android.graphics.drawable.GradientDrawable()
-            bg.shape = android.graphics.drawable.GradientDrawable.OVAL
+            bg.shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+            bg.cornerRadius = 4 * dp
             bg.setColor(
-                if (i == selectedIndex) android.graphics.Color.parseColor("#CCFF00")
-                else android.graphics.Color.parseColor("#444444")
+                if (isSelected) android.graphics.Color.parseColor("#CCFF00")
+                else android.graphics.Color.parseColor("#333355")
             )
             dot.background = bg
 
-            // Animation für aktiven Dot
-            if (i == selectedIndex) {
-                dot.scaleX = 0.5f
-                dot.scaleY = 0.5f
-                dot.animate().scaleX(1f).scaleY(1f).setDuration(300)
+            if (isSelected) {
+                dot.scaleX = 0.4f
+                dot.animate().scaleX(1f).setDuration(300)
                     .setInterpolator(OvershootInterpolator(2f)).start()
             }
-
             dotsLayout.addView(dot)
         }
     }
 
+    // ── Buttons ────────────────────────────────────────────────────────────
     private fun updateButtons(position: Int) {
         if (position == pages.size - 1) {
-            btnNext.text = "Los geht's ✓"
+            btnNext.text = "Jetzt starten  ✓"
             btnSkip.visibility = View.INVISIBLE
         } else {
-            btnNext.text = "Weiter →"
+            btnNext.text = "Weiter"
             btnSkip.visibility = View.VISIBLE
         }
     }
@@ -156,48 +144,45 @@ class OnboardingActivity : AppCompatActivity() {
         finish()
     }
 
-    // ─── Adapter ─────────────────────────────────────────────────────────────
-
+    // ── ViewPager Adapter ──────────────────────────────────────────────────
     inner class OnboardingAdapter(private val items: List<OnboardingPage>) :
         RecyclerView.Adapter<OnboardingAdapter.PageViewHolder>() {
 
         inner class PageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val tvIcon: TextView = view.findViewById(R.id.tvPageIcon)
-            val tvTitle: TextView = view.findViewById(R.id.tvPageTitle)
-            val tvDesc: TextView = view.findViewById(R.id.tvPageDesc)
+            val tvIcon: TextView         = view.findViewById(R.id.tvPageIcon)
+            val tvTitle: TextView        = view.findViewById(R.id.tvPageTitle)
+            val tvDesc: TextView         = view.findViewById(R.id.tvPageDesc)
             val highlightBox: LinearLayout = view.findViewById(R.id.highlightBox)
-            val tvHighlightIcon: TextView = view.findViewById(R.id.tvHighlightIcon)
-            val tvHighlightText: TextView = view.findViewById(R.id.tvHighlightText)
+            val tvHighlightIcon: TextView  = view.findViewById(R.id.tvHighlightIcon)
+            val tvHighlightText: TextView  = view.findViewById(R.id.tvHighlightText)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageViewHolder {
-            val view = LayoutInflater.from(parent.context)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PageViewHolder(
+            LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_onboarding_page, parent, false)
-            return PageViewHolder(view)
-        }
+        )
 
         override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
             val page = items[position]
-            holder.tvIcon.text = page.icon
+            holder.tvIcon.text  = page.icon
             holder.tvTitle.text = page.title
-            holder.tvDesc.text = page.description
+            holder.tvDesc.text  = page.description
 
             if (page.highlightText.isNotEmpty()) {
                 holder.highlightBox.visibility = View.VISIBLE
-                holder.tvHighlightIcon.text = page.highlightIcon
-                holder.tvHighlightText.text = page.highlightText
+                holder.tvHighlightIcon.text    = page.highlightIcon
+                holder.tvHighlightText.text    = page.highlightText
             } else {
                 holder.highlightBox.visibility = View.GONE
             }
 
-            // Einblend-Animation
-            holder.itemView.alpha = 0f
-            holder.itemView.translationY = 40f
+            // Stagger-Einblendung
+            holder.itemView.alpha       = 0f
+            holder.itemView.translationY = 50f
             holder.itemView.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setDuration(400)
-                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .alpha(1f).translationY(0f)
+                .setDuration(440)
+                .setInterpolator(DecelerateInterpolator(1.3f))
                 .start()
         }
 

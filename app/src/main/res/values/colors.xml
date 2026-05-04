@@ -1,35 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Colors -->
+    <!-- ═══ BRAND COLORS ═══════════════════════════════════════════════════ -->
     <color name="neon_yellow">#CCFF00</color>
-    <color name="neon_green">#00FF88</color>
+    <color name="neon_green">#00E676</color>
     <color name="neon_blue">#40C4FF</color>
+    <color name="neon_cyan">#00E5FF</color>
+    <color name="neon_purple">#B388FF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
-    <!-- Dark Theme -->
-    <color name="dark_bg">#0A0A0A</color>
-    <color name="dark_surface">#1A1A1A</color>
-    <color name="dark_card">#1E1E1E</color>
-    <color name="dark_input">#1A1A1A</color>
-    <color name="dark_divider">#2A2A2A</color>
-    <color name="dark_text">#FFFFFF</color>
-    <color name="dark_hint">#666666</color>
+    <!-- ═══ SEMANTIC COLORS ════════════════════════════════════════════════ -->
+    <color name="priority_red">#FF4757</color>
+    <color name="priority_orange">#FFA502</color>
+    <color name="complete_green">#2ED573</color>
+    <color name="complete_swipe_bg">#CC00B894</color>
+    <color name="delete_swipe_bg">#CC2D3436</color>
 
-    <!-- Light Theme -->
-    <color name="light_bg">#EEECE8</color>
+    <!-- ═══ DARK THEME – Deep Space ════════════════════════════════════════ -->
+    <color name="dark_bg">#080B14</color>
+    <color name="dark_surface">#0D1121</color>
+    <color name="dark_card">#131728</color>
+    <color name="dark_card_elevated">#1A1F35</color>
+    <color name="dark_input">#0D1121</color>
+    <color name="dark_divider">#1C2240</color>
+    <color name="dark_text">#EEF0FF</color>
+    <color name="dark_text_secondary">#7A8AAA</color>
+    <color name="dark_hint">#404D6A</color>
+    <color name="dark_chip_bg">#1ACCFF00</color>
+    <color name="dark_chip_selected">#33CCFF00</color>
+    <color name="dark_search_bg">#0F1428</color>
+
+    <!-- ═══ LIGHT THEME – Clean Paper ══════════════════════════════════════ -->
+    <color name="light_bg">#F4F6FB</color>
     <color name="light_surface">#FFFFFF</color>
     <color name="light_card">#FFFFFF</color>
-    <color name="light_input">#FFFFFF</color>
-    <color name="light_divider">#DDDDDD</color>
-    <color name="light_text">#111111</color>
-    <color name="light_hint">#999999</color>
+    <color name="light_card_elevated">#EEF2FA</color>
+    <color name="light_input">#EAEEF8</color>
+    <color name="light_divider">#DDE3F0</color>
+    <color name="light_text">#0D1121</color>
+    <color name="light_text_secondary">#5A6890</color>
+    <color name="light_hint">#9BA8C5</color>
+    <color name="light_chip_bg">#1A333333</color>
+    <color name="light_chip_selected">#33333333</color>
+    <color name="light_search_bg">#EAEEF8</color>
 
-    <!-- Accent -->
-    <color name="priority_red">#FF4444</color>
-    <color name="complete_green">#4CAF50</color>
+    <!-- ═══ CATEGORY COLORS ════════════════════════════════════════════════ -->
+    <color name="cat_home">#4CAF50</color>
+    <color name="cat_work">#2196F3</color>
+    <color name="cat_shopping">#FF9800</color>
+    <color name="cat_sport">#E91E63</color>
+    <color name="cat_health">#AB47BC</color>
+    <color name="cat_learn">#00BCD4</color>
 
-    <!-- Splash -->
-    <color name="splash_bg">#0A0A0A</color>
-    <color name="splash_red">#E8194B</color>
+    <!-- ═══ LEGACY / COMPATIBILITY ═════════════════════════════════════════ -->
+    <color name="colorPrimary">#CCFF00</color>
+    <color name="colorPrimaryVariant">#AABB00</color>
+    <color name="colorOnPrimary">#000000</color>
+    <color name="colorSecondary">#00E676</color>
+    <color name="colorOnSecondary">#000000</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
 </resources>
