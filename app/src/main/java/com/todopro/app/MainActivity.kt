@@ -681,7 +681,10 @@ class MainActivity : AppCompatActivity() {
         goalCard.visibility = View.VISIBLE
         tvGoalLabel.text = if (isReached) "🏆 Tagesziel erreicht!" else "🎯 Tagesziel: $goal Aufgaben"
         tvGoalCount.text = "$done / $goal"
-        ObjectAnimator.ofInt(goalProgressBar, "progress", goalProgressBar.progress, pct).setDuration(500).setInterpolator(DecelerateInterpolator()).start()
+        val anim = ObjectAnimator.ofInt(goalProgressBar, "progress", goalProgressBar.progress, pct)
+        anim.duration = 500
+        anim.interpolator = DecelerateInterpolator()
+        anim.start()
         if (goalCard.alpha == 0f) {
             goalCard.alpha = 0f; goalCard.translationY = -20f
             goalCard.animate().alpha(1f).translationY(0f).setDuration(340).setInterpolator(OvershootInterpolator(1.2f)).start()
