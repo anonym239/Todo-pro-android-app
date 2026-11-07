@@ -49,12 +49,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Archiv-Activity -->
-        <activity
-            android:name=".ArchiveActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
         <!-- Monats-Rückblick-Activity -->
         <activity
             android:name=".MonthlyReviewActivity"
