@@ -99,6 +99,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sidebarOverlay: View
     private lateinit var btnCloseSidebar: ImageButton
     private lateinit var menuStats: LinearLayout
+    private lateinit var menuArchive: LinearLayout
     private lateinit var menuTheme: LinearLayout
     private lateinit var menuNotifications: LinearLayout
     private lateinit var menuGoal: LinearLayout
@@ -213,6 +214,7 @@ class MainActivity : AppCompatActivity() {
         sidebarOverlay       = findViewById(R.id.sidebarOverlay)
         btnCloseSidebar      = findViewById(R.id.btnCloseSidebar)
         menuStats            = findViewById(R.id.menuStats)
+        menuArchive          = findViewById(R.id.menuArchive)
         menuTheme            = findViewById(R.id.menuTheme)
         menuNotifications    = findViewById(R.id.menuNotifications)
         menuGoal             = findViewById(R.id.menuGoal)
@@ -507,6 +509,10 @@ class MainActivity : AppCompatActivity() {
 
         menuStats.setOnClickListener { afterClose {
             startActivity(Intent(this, StatsActivity::class.java))
+            overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out_short)
+        }}
+        menuArchive.setOnClickListener { afterClose {
+            startActivity(Intent(this, ArchiveActivity::class.java))
             overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out_short)
         }}
         menuMonthlyReview.setOnClickListener { afterClose {
