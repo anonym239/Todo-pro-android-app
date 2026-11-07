@@ -318,15 +318,29 @@ class MainActivity : AppCompatActivity() {
         sidebarPanel.visibility = View.VISIBLE
         sidebarOverlay.visibility = View.VISIBLE
         sidebarOverlay.alpha = 0f
-        sidebarPanel.translationX = 290f.dpToPx()
-        sidebarPanel.animate().translationX(0f).setDuration(300).setInterpolator(DecelerateInterpolator(1.5f)).start()
+        sidebarPanel.translationX = 310f.dpToPx()
+        sidebarPanel.animate().translationX(0f).setDuration(340).setInterpolator(DecelerateInterpolator(2f)).start()
         sidebarOverlay.animate().alpha(1f).setDuration(300).start()
+
+        // Zahlen oben im Menue
+        findViewById<TextView>(R.id.tvMenuOpen).text = "${todos.size}"
+        findViewById<TextView>(R.id.tvMenuDone).text = "${TodoStorage.getCompletedToday(this)}"
+
+        // Gruppen nacheinander sanft einblenden
+        listOf(R.id.menuSummary, R.id.menuGroupTasks, R.id.menuGroupReview, R.id.menuGroupApp)
+            .forEachIndexed { i, id ->
+                val v = findViewById<View>(id)
+                v.alpha = 0f; v.translationX = 40f.dpToPx()
+                v.animate().alpha(1f).translationX(0f)
+                    .setStartDelay(90L + i * 60L).setDuration(360)
+                    .setInterpolator(DecelerateInterpolator(1.8f)).start()
+            }
     }
 
     private fun closeSidebar() {
         if (!isSidebarOpen) return
         isSidebarOpen = false
-        sidebarPanel.animate().translationX(290f.dpToPx()).setDuration(260).setInterpolator(DecelerateInterpolator())
+        sidebarPanel.animate().translationX(310f.dpToPx()).setDuration(260).setInterpolator(DecelerateInterpolator())
             .withEndAction { sidebarPanel.visibility = View.GONE }.start()
         sidebarOverlay.animate().alpha(0f).setDuration(260)
             .withEndAction { sidebarOverlay.visibility = View.GONE }.start()

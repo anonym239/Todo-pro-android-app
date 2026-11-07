@@ -409,218 +409,406 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- SIDEBAR PANEL -->
+    <!-- SIDEBAR PANEL (modernes, gruppiertes Menue) -->
     <LinearLayout
         android:id="@+id/sidebarPanel"
-        android:layout_width="290dp"
+        android:layout_width="310dp"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:background="?attr/todoCardColor"
-        android:elevation="20dp"
+        android:background="@drawable/sidebar_bg"
+        android:elevation="24dp"
         android:visibility="gone"
-        android:translationX="290dp"
+        android:translationX="310dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Sidebar Header -->
+        <!-- Kopf -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingHorizontal="20dp"
-            android:paddingTop="52dp"
-            android:paddingBottom="20dp">
+            android:paddingTop="44dp"
+            android:paddingBottom="12dp">
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TODO"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/todoTextColor"
-                        android:fontFamily="sans-serif-black" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PRO"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/neon_yellow"
-                        android:fontFamily="sans-serif-black" />
-                </LinearLayout>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Dein smarter Begleiter"
-                    android:textSize="11sp"
-                    android:textColor="?attr/todoHintColor"
-                    android:fontFamily="sans-serif"
-                    android:layout_marginTop="2dp" />
+                android:orientation="horizontal">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Men&#252;" android:textSize="26sp" android:textStyle="bold"
+                    android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-black" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="." android:textSize="26sp" android:textStyle="bold"
+                    android:textColor="@color/neon_yellow" android:fontFamily="sans-serif-black" />
             </LinearLayout>
             <ImageButton
                 android:id="@+id/btnCloseSidebar"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="@drawable/btn_icon_bg"
                 android:src="@drawable/ic_close"
-                android:contentDescription="Schliessen"
-                android:padding="8dp" />
+                android:contentDescription="Men&#252; schlie&#223;en"
+                android:padding="11dp" />
         </LinearLayout>
 
-        <View
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?attr/todoDividerColor"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="none"
+            android:overScrollMode="never">
 
-        <!-- Menu items -->
-        <LinearLayout
-            android:id="@+id/menuStats"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#128202;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Statistiken" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="32dp">
 
-        <LinearLayout
-            android:id="@+id/menuArchive"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#128230;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Archiv" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
-        </LinearLayout>
+                <!-- Kurze Zusammenfassung -->
+                <LinearLayout
+                    android:id="@+id/menuSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/menu_summary_bg"
+                    android:padding="16dp"
+                    android:layout_marginTop="4dp">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvMenuOpen" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" android:textSize="26sp"
+                            android:textStyle="bold" android:textColor="?attr/todoTextColor"
+                            android:fontFamily="sans-serif-black" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="offen" android:textSize="12sp"
+                            android:textColor="?attr/todoTextSecondary" />
+                    </LinearLayout>
+                    <View android:layout_width="1dp" android:layout_height="match_parent"
+                        android:background="?attr/todoDividerColor" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvMenuDone" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" android:textSize="26sp"
+                            android:textStyle="bold" android:textColor="@color/complete_green"
+                            android:fontFamily="sans-serif-black" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="heute erledigt" android:textSize="12sp"
+                            android:textColor="?attr/todoTextSecondary" />
+                    </LinearLayout>
+                </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/menuMonthlyReview"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#128197;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Monats-Rueckblick" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="MEINE AUFGABEN" android:textSize="12sp" android:letterSpacing="0.08"
+            android:textColor="?attr/todoTextSecondary" android:fontFamily="sans-serif-medium"
+            android:layout_marginStart="8dp" android:layout_marginTop="18dp" android:layout_marginBottom="8dp" />
 
         <LinearLayout
-            android:id="@+id/menuShare"
+            android:id="@+id/menuGroupTasks"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#128228;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Liste teilen (z.B. WhatsApp)" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/menu_group_bg"
+            android:clipToOutline="true">
+
+            <LinearLayout
+                android:id="@+id/menuShare"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#3340C4FF"
+                    android:gravity="center" android:text="&#128228;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Liste teilen" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Per WhatsApp, SMS oder E-Mail" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="?attr/todoDividerColor" android:layout_marginStart="68dp" />
+
+            <LinearLayout
+                android:id="@+id/menuArchive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#33FFA502"
+                    android:gravity="center" android:text="&#128230;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Archiv" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Erledigte Aufgaben ansehen" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="?attr/todoDividerColor" android:layout_marginStart="68dp" />
+
+            <LinearLayout
+                android:id="@+id/menuGoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#33FF4757"
+                    android:gravity="center" android:text="&#127919;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Tagesziel" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Wie viel will ich heute schaffen?" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+
         </LinearLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="1dp"
-            android:background="?attr/todoDividerColor"
-            android:layout_marginHorizontal="20dp" android:layout_marginVertical="6dp" />
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="R&#220;CKBLICK" android:textSize="12sp" android:letterSpacing="0.08"
+            android:textColor="?attr/todoTextSecondary" android:fontFamily="sans-serif-medium"
+            android:layout_marginStart="8dp" android:layout_marginTop="18dp" android:layout_marginBottom="8dp" />
 
         <LinearLayout
-            android:id="@+id/menuGoal"
+            android:id="@+id/menuGroupReview"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#127919;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Tagesziel setzen" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/menu_group_bg"
+            android:clipToOutline="true">
+
+            <LinearLayout
+                android:id="@+id/menuStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#332ED573"
+                    android:gravity="center" android:text="&#128202;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Statistiken" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Was habe ich geschafft?" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="?attr/todoDividerColor" android:layout_marginStart="68dp" />
+
+            <LinearLayout
+                android:id="@+id/menuMonthlyReview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#33B388FF"
+                    android:gravity="center" android:text="&#128197;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Monats-R&#252;ckblick" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Mein Monat auf einen Blick" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+
         </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="APP" android:textSize="12sp" android:letterSpacing="0.08"
+            android:textColor="?attr/todoTextSecondary" android:fontFamily="sans-serif-medium"
+            android:layout_marginStart="8dp" android:layout_marginTop="18dp" android:layout_marginBottom="8dp" />
 
         <LinearLayout
-            android:id="@+id/menuNotifications"
+            android:id="@+id/menuGroupApp"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#9881;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Einstellungen" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/menu_group_bg"
+            android:clipToOutline="true">
+
+            <LinearLayout
+                android:id="@+id/menuNotifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#33A0A0A0"
+                    android:gravity="center" android:text="&#9881;&#65039;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Einstellungen" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Gro&#223;e Schrift, Erinnerungen &#8230;" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="?attr/todoDividerColor" android:layout_marginStart="68dp" />
+
+            <LinearLayout
+                android:id="@+id/menuTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#33CCFF00"
+                    android:gravity="center" android:text="&#127763;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Hell / Dunkel" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Farben umschalten" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:background="?attr/todoDividerColor" android:layout_marginStart="68dp" />
+
+            <LinearLayout
+                android:id="@+id/menuHelp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="40dp" android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_tile"
+                    android:backgroundTint="#3300E5FF"
+                    android:gravity="center" android:text="&#10067;" android:textSize="19sp"
+                    android:layout_marginEnd="14dp" />
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Hilfe" android:textSize="16sp"
+                        android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif-medium" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="So funktioniert die App" android:textSize="12sp"
+                        android:textColor="?attr/todoTextSecondary" android:layout_marginTop="1dp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#8250;" android:textSize="24sp"
+                    android:textColor="?attr/todoHintColor" android:paddingStart="8dp" />
+            </LinearLayout>
+
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/menuTheme"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#127769;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Dark / Light Mode" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
-        </LinearLayout>
-
-        <View android:layout_width="match_parent" android:layout_height="1dp"
-            android:background="?attr/todoDividerColor"
-            android:layout_marginHorizontal="20dp" android:layout_marginVertical="6dp" />
-
-        <LinearLayout
-            android:id="@+id/menuHelp"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:background="?attr/selectableItemBackground">
-            <TextView android:layout_width="28dp" android:layout_height="28dp"
-                android:text="&#10067;" android:textSize="18sp" android:gravity="center"
-                android:layout_marginEnd="14dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Hilfe und Tipps" android:textSize="15sp"
-                android:textColor="?attr/todoTextColor" android:fontFamily="sans-serif" />
-        </LinearLayout>
-
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 
     <!-- SNACKBAR -->
