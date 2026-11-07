@@ -111,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:text="In 15 Min"
                     android:textColor="#CCCCCC"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -136,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:text="In 30 Min"
                     android:textColor="#CCCCCC"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -170,7 +170,7 @@
                     android:layout_height="wrap_content"
                     android:text="In 1 Stunde"
                     android:textColor="#CCCCCC"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -195,10 +195,64 @@
                     android:layout_height="wrap_content"
                     android:text="Morgen 9:00"
                     android:textColor="#CCCCCC"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Wiederholen?"
+            android:textColor="#AAAAAA"
+            android:textSize="13sp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/repeatNone"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Einmal"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:background="@drawable/repeat_chip_bg"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/repeatDaily"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Täglich"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:background="@drawable/repeat_chip_bg"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/repeatWeekly"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Wöchentlich"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:background="@drawable/repeat_chip_bg" />
 
         </LinearLayout>
 
@@ -259,6 +313,19 @@
                 android:paddingHorizontal="16dp" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnRemoveReminder"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="🔕  Erinnerung entfernen"
+            android:textColor="#FF6B6B"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="?attr/selectableItemBackground"
+            android:layout_marginTop="12dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

@@ -12,12 +12,18 @@ class BootReceiver : BroadcastReceiver() {
             // Nach Neustart alle gespeicherten Alarme neu registrieren
             val todos = TodoStorage.loadTodos(context)
             val now = System.currentTimeMillis()
+            var changed = false
             for (todo in todos) {
-                val reminderTime = todo.reminderTime
-                if (reminderTime != null && reminderTime > now) {
-                    AlarmScheduler.scheduleAlarm(context, todo)
+                val reminderTime = todo.reminderTime ?: continue
+                if (reminderTime <= now) {
+                    // Wiederkehrende Erinnerungen, die während des Ausschaltens fällig waren → nächster Termin
+                    val next = AlarmScheduler.nextOccurrence(todo, now) ?: continue
+                    todo.reminderTime = next
+                    changed = true
                 }
+                AlarmScheduler.scheduleAlarm(context, todo)
             }
+            if (changed) TodoStorage.saveTodos(context, todos)
         }
     }
 }

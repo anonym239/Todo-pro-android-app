@@ -47,26 +47,33 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationText = if (isPriority) "🚨$cleanText🚨" else cleanText
         val notificationTitle = if (isPriority) "🚨 Wichtige Erinnerung!" else "⏰ TodoPro Erinnerung"
 
-        // Zähler erhöhen – Warnung nur bei 1. und 2. Benachrichtigung
-        val notifCount = TodoStorage.incrementNotificationCount(context)
-        val bigText = if (notifCount <= 2) {
-            "$notificationText\n\n⚠️ Achtung: Nach dem Wegwischen wird diese Todo automatisch als erledigt markiert!"
-        } else {
-            notificationText
-        }
-
         val notifId = todoId.hashCode()
 
-        // Wegwischen der Notification → Todo automatisch als erledigt markieren (deleteIntent)
-        val dismissIntent = Intent(context, NotificationActionReceiver::class.java).apply {
-            action = NotificationActionReceiver.ACTION_COMPLETE
-            putExtra(NotificationActionReceiver.EXTRA_TODO_ID, todoId)
-            putExtra(NotificationActionReceiver.EXTRA_NOTIF_ID, notifId)
+        // Wiederkehrende Aufgabe → sofort den nächsten Termin planen
+        val stored = TodoStorage.loadTodos(context).find { it.id == todoId }
+        var bigText = notificationText
+        if (stored != null) {
+            val next = AlarmScheduler.nextOccurrence(stored)
+            if (next != null) {
+                stored.reminderTime = next
+                TodoStorage.updateTodo(context, stored)
+                AlarmScheduler.scheduleAlarm(context, stored)
+                val sdf = java.text.SimpleDateFormat("EEEE, HH:mm", java.util.Locale.GERMAN)
+                bigText = "$notificationText\n\n🔁 Nächste Erinnerung: ${sdf.format(java.util.Date(next))}"
+            }
         }
-        val dismissPendingIntent = PendingIntent.getBroadcast(
-            context, notifId + 2, dismissIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+
+        fun actionIntent(action: String, code: Int): PendingIntent {
+            val i = Intent(context, NotificationActionReceiver::class.java).apply {
+                this.action = action
+                putExtra(NotificationActionReceiver.EXTRA_TODO_ID, todoId)
+                putExtra(NotificationActionReceiver.EXTRA_NOTIF_ID, notifId)
+            }
+            return PendingIntent.getBroadcast(
+                context, code, i,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
@@ -82,8 +89,11 @@ class AlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(pendingIntent, true)
-            // Wenn Notification weggewischt wird → Todo erledigen
-            .setDeleteIntent(dismissPendingIntent)
+            // Große, klare Knöpfe direkt in der Benachrichtigung
+            .addAction(R.drawable.ic_check, "✓ Erledigt",
+                actionIntent(NotificationActionReceiver.ACTION_COMPLETE, notifId + 2))
+            .addAction(R.drawable.ic_bell, "⏰ In 10 Min nochmal",
+                actionIntent(NotificationActionReceiver.ACTION_SNOOZE, notifId + 3))
             .build()
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

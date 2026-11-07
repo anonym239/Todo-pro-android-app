@@ -32,21 +32,29 @@ class TodoAdapter(
     private var searchQuery: String = ""
     private var filterCategory: TodoCategory = TodoCategory.NONE
 
-    private val displayList: MutableList<TodoItem>
-        get() {
-            var list = todos.toList()
-            if (searchQuery.isNotBlank()) {
-                val q = searchQuery.lowercase()
-                list = list.filter { it.text.lowercase().contains(q) }
-            }
-            if (filterCategory != TodoCategory.NONE) {
-                list = list.filter { it.category == filterCategory.name }
-            }
-            return list.toMutableList()
-        }
+    private var displayList: List<TodoItem> = todos.toList()
+    var largeText: Boolean = false
 
-    fun setSearchQuery(query: String) { searchQuery = query; notifyDataSetChanged() }
-    fun setFilter(category: TodoCategory) { filterCategory = category; notifyDataSetChanged() }
+    /** Sichtbare Liste neu berechnen (nach jeder Änderung an todos aufrufen) */
+    fun recompute() {
+        var list = todos.toList()
+        if (searchQuery.isNotBlank()) {
+            val q = searchQuery.lowercase()
+            list = list.filter { it.text.lowercase().contains(q) }
+        }
+        if (filterCategory != TodoCategory.NONE) {
+            list = list.filter { it.category == filterCategory.name }
+        }
+        displayList = list
+    }
+
+    fun refresh() { recompute(); notifyDataSetChanged() }
+    fun positionOf(todo: TodoItem) = displayList.indexOfFirst { it.id == todo.id }
+    fun getItemAt(position: Int): TodoItem? = displayList.getOrNull(position)
+    fun visibleCount() = displayList.size
+
+    fun setSearchQuery(query: String) { searchQuery = query; refresh() }
+    fun setFilter(category: TodoCategory) { filterCategory = category; refresh() }
 
     // ── ViewHolder ──────────────────────────────────────────────────────────
     inner class TodoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -83,6 +91,14 @@ class TodoAdapter(
             todo.text.removePrefix("!").trimStart() else todo.text
         holder.editText.setText(displayText)
         holder.editText.setSelection(displayText.length)
+        holder.editText.textSize = if (largeText) 21f else 17f
+        holder.tvReminderTime.textSize = if (largeText) 15f else 13f
+
+        // Karte sauber zurücksetzen (wichtig nach Erledigt-Animation / Recycling)
+        holder.cardContent.translationX = 0f
+        holder.cardContent.alpha = 1f
+        holder.btnComplete.isEnabled = true
+        holder.btnComplete.setBackgroundResource(R.drawable.btn_complete_bg)
 
         // Priority bar
         holder.priorityBar.visibility = if (todo.isPriority) View.VISIBLE else View.GONE
@@ -112,9 +128,21 @@ class TodoAdapter(
 
         // Reminder
         if (todo.reminderTime != null) {
-            val sdf = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMAN)
-            holder.tvReminderTime.text = "⏰ ${sdf.format(Date(todo.reminderTime!!))}"
+            val time = todo.reminderTime!!
+            val overdue = time < System.currentTimeMillis()
+            val repeat = AlarmScheduler.repeatLabel(todo)
+            holder.tvReminderTime.text = buildString {
+                append(if (overdue) "⚠️ " else "⏰ ")
+                append(friendlyTime(time))
+                if (overdue) append(" · überfällig")
+                if (repeat != null) append(" · 🔁 ").append(repeat)
+            }
+            holder.tvReminderTime.setTextColor(
+                if (overdue) 0xFFFF6B6B.toInt()
+                else holder.itemView.context.getColor(R.color.neon_yellow)
+            )
             holder.tvReminderTime.visibility = View.VISIBLE
+            holder.tvReminderTime.setOnClickListener { onReminderClick(todo) }
             holder.btnReminder.alpha = 1f
         } else {
             holder.tvReminderTime.visibility = View.GONE
@@ -181,7 +209,10 @@ class TodoAdapter(
         // Complete
         holder.btnComplete.setOnClickListener {
             holder.btnComplete.isEnabled = false
-            holder.btnComplete.animate().scaleX(1.35f).scaleY(1.35f).setDuration(100)
+            holder.btnComplete.setBackgroundResource(R.drawable.btn_complete_bg_done)
+            holder.btnComplete.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM)
+            holder.btnComplete.animate().scaleX(1.35f).scaleY(1.35f).setDuration(120)
+                .setInterpolator(OvershootInterpolator(3f))
                 .withEndAction {
                     holder.btnComplete.animate().scaleX(1f).scaleY(1f).setDuration(80)
                         .withEndAction {
@@ -202,6 +233,23 @@ class TodoAdapter(
                         .setInterpolator(OvershootInterpolator()).start()
                 }.start()
             onReminderClick(todo)
+        }
+    }
+
+    /** "Heute 14:30", "Morgen 09:00" oder "Mo, 12.11. 09:00" – leichter lesbar */
+    private fun friendlyTime(time: Long): String {
+        val target = Calendar.getInstance().apply { timeInMillis = time }
+        val today = Calendar.getInstance()
+        val hm = SimpleDateFormat("HH:mm", Locale.GERMAN).format(Date(time))
+        fun sameDay(a: Calendar, b: Calendar) =
+            a.get(Calendar.YEAR) == b.get(Calendar.YEAR) && a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR)
+        val tomorrow = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 1) }
+        val yesterday = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -1) }
+        return when {
+            sameDay(target, today) -> "Heute $hm"
+            sameDay(target, tomorrow) -> "Morgen $hm"
+            sameDay(target, yesterday) -> "Gestern $hm"
+            else -> SimpleDateFormat("EE, dd.MM. HH:mm", Locale.GERMAN).format(Date(time))
         }
     }
 

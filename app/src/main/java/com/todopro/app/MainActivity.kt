@@ -68,6 +68,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvProgressPercent: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var tvStreakHeader: TextView
+    private lateinit var tvDate: TextView
+    private lateinit var btnVoice: ImageButton
+    private lateinit var tvSnackbarAction: TextView
+    private lateinit var menuShare: LinearLayout
+    private var isFirstResume = true
+
+    // Spracheingabe: gesprochener Text landet direkt als neue Aufgabe in der Liste
+    private val voiceLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val spoken = result.data
+            ?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull()
+        if (!spoken.isNullOrBlank()) {
+            editInput.setText(spoken.replaceFirstChar { it.uppercase() })
+            editInput.setSelection(editInput.text.length)
+            addTodo()
+        }
+    }
 
     // Goal card
     private lateinit var goalCard: LinearLayout
@@ -122,6 +141,7 @@ class MainActivity : AppCompatActivity() {
         updateTodoCount()
         updateGoalCard()
         updateStreakHeader()
+        updateDateHeader()
         buildFilterChips()
         scheduleDailySummaryIfNeeded()
         animateHeaderIn()
@@ -129,6 +149,28 @@ class MainActivity : AppCompatActivity() {
         // Update-Check nach 2s
         val ver = try { packageManager.getPackageInfo(packageName, 0).versionName ?: "1.0" } catch (_: Exception) { "1.0" }
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ UpdateChecker.checkForUpdate(this, ver) }, 2000)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isFirstResume) { isFirstResume = false; return }
+        // Aufgaben können per Benachrichtigung erledigt worden sein -> neu laden
+        loadTodos()
+        adapter.largeText = TodoStorage.isLargeText(this)
+        adapter.refresh()
+        updateEmptyView(); updateTodoCount(); updateGoalCard(); updateStreakHeader(); updateDateHeader()
+    }
+
+    private fun updateDateHeader() {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val greeting = when (hour) {
+            in 5..10 -> "Guten Morgen"
+            in 11..17 -> "Hallo"
+            in 18..22 -> "Guten Abend"
+            else -> "Gute Nacht"
+        }
+        val date = SimpleDateFormat("EEEE, d. MMMM", Locale.GERMAN).format(Date())
+        tvDate.text = "$greeting · $date"
     }
 
     private fun applyTheme() {
@@ -160,6 +202,10 @@ class MainActivity : AppCompatActivity() {
         tvProgressPercent    = findViewById(R.id.tvProgressPercent)
         progressBar          = findViewById(R.id.progressBar)
         tvStreakHeader       = findViewById(R.id.tvStreakHeader)
+        tvDate               = findViewById(R.id.tvDate)
+        btnVoice             = findViewById(R.id.btnVoice)
+        tvSnackbarAction     = findViewById(R.id.tvSnackbarAction)
+        menuShare            = findViewById(R.id.menuShare)
         goalCard             = findViewById(R.id.goalCard)
         tvGoalLabel          = findViewById(R.id.tvGoalLabel)
         tvGoalCount          = findViewById(R.id.tvGoalCount)
@@ -187,7 +233,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtonAnimations() {
-        listOf(btnAdd, btnMenu, btnSearch).forEach { btn ->
+        listOf(btnAdd, btnMenu, btnSearch, btnVoice).forEach { btn ->
             btn.setOnTouchListener { v, event ->
                 when (event.action) {
                     android.view.MotionEvent.ACTION_DOWN -> v.animate().scaleX(0.88f).scaleY(0.88f).setDuration(90).start()
@@ -296,7 +342,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sortTodos() {
-        todos.sortWith(compareByDescending<TodoItem> { it.isPriority }.thenByDescending { it.createdAt })
+        todos.sortWith(
+            compareByDescending<TodoItem> { it.isPriority }
+                .thenBy { it.reminderTime ?: Long.MAX_VALUE }
+                .thenByDescending { it.createdAt }
+        )
     }
 
     // ── RecyclerView ──────────────────────────────────────────────────────────
@@ -314,7 +364,7 @@ class MainActivity : AppCompatActivity() {
             onReminderSuggestion = { todo, suggestedTime ->
                 todo.reminderTime = suggestedTime; saveTodos()
                 AlarmScheduler.scheduleAlarm(this, todo)
-                adapter.notifyDataSetChanged()
+                adapter.refresh()
                 val sdf = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMAN)
                 showSnackbar("⏰ Erinnerung gesetzt: ${sdf.format(Date(suggestedTime))}")
             },
@@ -325,6 +375,8 @@ class MainActivity : AppCompatActivity() {
                 buildFilterChips()
             }
         )
+        adapter.largeText = TodoStorage.isLargeText(this)
+        if (adapter.largeText) editInput.textSize = 20f
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
         recyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator().apply {
@@ -350,8 +402,7 @@ class MainActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val pos = viewHolder.adapterPosition
                 // Hole das Todo aus der displayList des Adapters – wir nehmen direkt todos[pos] wenn gleich
-                if (pos < 0 || pos >= todos.size) return
-                val todo = todos[pos]
+                val todo = adapter.getItemAt(pos) ?: return
 
                 when (direction) {
                     ItemTouchHelper.LEFT -> {
@@ -362,8 +413,9 @@ class MainActivity : AppCompatActivity() {
                         showSnackbarWithUndo("🗑️ Aufgabe gelöscht") {
                             lastDeletedTodo?.let { restored ->
                                 todos.add(0, restored); sortTodos()
-                                adapter.notifyDataSetChanged()
-                                saveTodos(); updateEmptyView(); updateTodoCount()
+                                adapter.refresh()
+                                AlarmScheduler.scheduleAlarm(this@MainActivity, restored)
+                                saveTodos(); updateEmptyView(); updateTodoCount(); buildFilterChips()
                             }
                         }
                     }
@@ -445,6 +497,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        btnVoice.setOnClickListener { startVoiceInput() }
         btnMenu.setOnClickListener { openSidebar() }
         sidebarOverlay.setOnClickListener { closeSidebar() }
         btnCloseSidebar.setOnClickListener { closeSidebar() }
@@ -456,19 +509,20 @@ class MainActivity : AppCompatActivity() {
 
         menuStats.setOnClickListener { afterClose {
             startActivity(Intent(this, StatsActivity::class.java))
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+            overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out_short)
         }}
         menuArchive.setOnClickListener { afterClose {
             startActivity(Intent(this, ArchiveActivity::class.java))
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+            overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out_short)
         }}
         menuMonthlyReview.setOnClickListener { afterClose {
             startActivity(Intent(this, MonthlyReviewActivity::class.java))
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out)
+            overridePendingTransition(R.anim.slide_in_right, R.anim.fade_out_short)
         }}
         menuTheme.setOnClickListener { afterClose {
             isDarkMode = !isDarkMode; TodoStorage.setDarkMode(this, isDarkMode); recreate()
         }}
+        menuShare.setOnClickListener { afterClose { shareList() } }
         menuNotifications.setOnClickListener { afterClose { showNotificationSettings() }}
         menuGoal.setOnClickListener       { afterClose { showDailyGoalDialog() }}
         menuHelp.setOnClickListener       { afterClose { showHelpDialog() }}
@@ -498,8 +552,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         todos.add(0, todo); sortTodos()
-        val insertPos = todos.indexOf(todo)
-        adapter.notifyItemInserted(insertPos)
+        adapter.recompute()
+        val insertPos = adapter.positionOf(todo)
+        if (insertPos >= 0) {
+            adapter.notifyItemInserted(insertPos)
+            recyclerView.post { recyclerView.smoothScrollToPosition(insertPos) }
+        } else {
+            showSnackbar("✓ Hinzugefügt (durch Suche/Filter gerade ausgeblendet)")
+        }
         saveTodos()
         editInput.setText("")
         updateEmptyView(); updateTodoCount()
@@ -515,35 +575,103 @@ class MainActivity : AppCompatActivity() {
 
     private fun deleteTodo(todo: TodoItem) {
         AlarmScheduler.cancelAlarm(this, todo)
-        val index = todos.indexOf(todo)
+        val index = todos.indexOfFirst { it.id == todo.id }
         if (index >= 0) {
-            todos.removeAt(index); adapter.notifyItemRemoved(index)
+            val pos = adapter.positionOf(todo)
+            todos.removeAt(index); adapter.recompute()
+            if (pos >= 0) adapter.notifyItemRemoved(pos) else adapter.notifyDataSetChanged()
             saveTodos(); updateEmptyView(); updateTodoCount(); buildFilterChips()
         }
     }
 
     private fun completeTodo(todo: TodoItem) {
-        AlarmScheduler.cancelAlarm(this, todo)
-        val index = todos.indexOf(todo)
-        if (index >= 0) {
-            todos.removeAt(index); adapter.notifyItemRemoved(index)
-            val done = todo.copy(isCompleted = true, completedAt = System.currentTimeMillis())
-            completedTodos.add(done)
-            TodoStorage.saveCompletedTodos(this, completedTodos)
+        val index = todos.indexOfFirst { it.id == todo.id }
+        if (index < 0) return
+
+        // Wiederkehrende Aufgabe: bleibt in der Liste, springt auf den nächsten Termin
+        val next = AlarmScheduler.nextOccurrence(todo)
+        if (next != null) {
+            AlarmScheduler.cancelAlarm(this, todo)
+            todo.reminderTime = next
+            AlarmScheduler.scheduleAlarm(this, todo)
             TodoStorage.recordTodoCompleted(this)
             TodoStorage.recordDayCount(this, TodoStorage.getCompletedToday(this))
             TodoStorage.checkAndRecordGoalReached(this)
-            saveTodos(); updateEmptyView(); updateTodoCount(); updateGoalCard(); updateStreakHeader()
+            sortTodos(); adapter.refresh(); saveTodos()
+            updateTodoCount(); updateGoalCard(); updateStreakHeader()
             vibrate(80)
             if (TodoStorage.isKonfettiEnabled(this)) launchKonfetti()
-            if (TodoStorage.isComplimentsEnabled(this)) showCompliment()
-            val streak = TodoStorage.getStreak(this)
-            if (streak > 1 && streak % 5 == 0) {
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    showSnackbar("🔥 $streak Tage Streak! Unglaublich!")
-                }, 1500)
+            val sdf = SimpleDateFormat("EEEE, HH:mm", Locale.GERMAN)
+            showSnackbar("✓ Erledigt · Nächstes Mal: ${sdf.format(Date(next))}")
+            return
+        }
+
+        AlarmScheduler.cancelAlarm(this, todo)
+        val pos = adapter.positionOf(todo)
+        todos.removeAt(index); adapter.recompute()
+        if (pos >= 0) adapter.notifyItemRemoved(pos) else adapter.notifyDataSetChanged()
+        val done = todo.copy(isCompleted = true, completedAt = System.currentTimeMillis())
+        completedTodos.add(done)
+        TodoStorage.saveCompletedTodos(this, completedTodos)
+        TodoStorage.recordTodoCompleted(this)
+        TodoStorage.recordDayCount(this, TodoStorage.getCompletedToday(this))
+        TodoStorage.checkAndRecordGoalReached(this)
+        saveTodos(); updateEmptyView(); updateTodoCount(); updateGoalCard(); updateStreakHeader(); buildFilterChips()
+        vibrate(80)
+        if (TodoStorage.isKonfettiEnabled(this)) launchKonfetti()
+
+        // Versehentlich abgehakt? -> Rückgängig möglich
+        val message = if (TodoStorage.isComplimentsEnabled(this)) complimentText() else "✓ Erledigt"
+        showSnackbarWithUndo(message) { undoComplete(todo, done) }
+
+        val streak = TodoStorage.getStreak(this)
+        if (streak > 1 && streak % 5 == 0) {
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                showSnackbar("🔥 $streak Tage Streak! Unglaublich!")
+            }, 5500)
+        }
+    }
+
+    private fun undoComplete(original: TodoItem, done: TodoItem) {
+        completedTodos.removeAll { it.id == done.id }
+        TodoStorage.saveCompletedTodos(this, completedTodos)
+        TodoStorage.undoTodoCompleted(this)
+        val restored = original.copy(isCompleted = false, completedAt = null)
+        todos.add(restored); sortTodos(); adapter.refresh()
+        AlarmScheduler.scheduleAlarm(this, restored)
+        saveTodos(); updateEmptyView(); updateTodoCount(); updateGoalCard(); buildFilterChips()
+    }
+
+    // ── Spracheingabe ─────────────────────────────────────────────────────────
+    private fun startVoiceInput() {
+        val intent = Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, "de-DE")
+            putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, "Was möchtest du dir merken?")
+        }
+        try {
+            voiceLauncher.launch(intent)
+        } catch (_: Exception) {
+            Toast.makeText(this, "Spracheingabe ist auf diesem Handy nicht verfügbar", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // ── Liste teilen ──────────────────────────────────────────────────────────
+    private fun shareList() {
+        if (todos.isEmpty()) { showSnackbar("Die Liste ist leer – nichts zu teilen"); return }
+        val text = buildString {
+            append("📝 Meine Aufgaben:\n\n")
+            todos.forEach { t ->
+                val clean = t.text.removePrefix("!").trimStart()
+                append(if (t.isPriority) "❗ " else "▫️ ").append(clean).append("\n")
             }
         }
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        startActivity(Intent.createChooser(send, "Liste teilen über…"))
     }
 
     // ── Vibration ────────────────────────────────────────────────────────────
@@ -585,47 +713,46 @@ class MainActivity : AppCompatActivity() {
             position=Position.Relative(0.5, 0.3)))
     }
 
-    private fun showCompliment() {
+    private fun complimentText(): String {
         val c = listOf("🎉 Großartig! Weiter so!","💪 Du rockst das!","⭐ Klasse!",
             "🚀 Produktivitäts-Monster!","✨ Perfekt gemacht!","🏆 Champion!",
             "🔥 On fire heute!","💥 Erledigt!","🎯 Volltreffer!","⚡ Blitzschnell!")
-        showSnackbar(c.random())
+        return c.random()
     }
 
     // ── Snackbar ──────────────────────────────────────────────────────────────
-    private fun showSnackbar(message: String) {
-        tvSnackbar.text = message
-        snackbarLayout.visibility = View.VISIBLE
-        snackbarLayout.alpha = 0f; snackbarLayout.translationY = 60f
-        snackbarLayout.animate().alpha(1f).translationY(0f).setDuration(300)
-            .setInterpolator(OvershootInterpolator(1.5f)).start()
-        snackbarRunnable?.let { snackbarLayout.removeCallbacks(it) }
-        snackbarRunnable = Runnable {
-            snackbarLayout.animate().alpha(0f).translationY(30f).setDuration(260)
-                .setInterpolator(DecelerateInterpolator())
-                .withEndAction { snackbarLayout.visibility = View.GONE; snackbarLayout.translationY = 0f }.start()
-        }
-        snackbarLayout.postDelayed(snackbarRunnable!!, 3200)
-        snackbarLayout.setOnClickListener(null)
-    }
+    private fun showSnackbar(message: String) = showSnackbarInternal(message, 3200, null)
 
-    private fun showSnackbarWithUndo(message: String, onUndo: () -> Unit) {
-        tvSnackbar.text = "$message  ↩ Rückgängig"
+    private fun showSnackbarWithUndo(message: String, onUndo: () -> Unit) =
+        showSnackbarInternal(message, 5000, onUndo)
+
+    private fun showSnackbarInternal(message: String, durationMs: Long, onUndo: (() -> Unit)?) {
+        tvSnackbar.text = message
+        tvSnackbarAction.visibility = if (onUndo != null) View.VISIBLE else View.GONE
         snackbarLayout.visibility = View.VISIBLE
+        snackbarLayout.animate().cancel()
         snackbarLayout.alpha = 0f; snackbarLayout.translationY = 60f
-        snackbarLayout.animate().alpha(1f).translationY(0f).setDuration(300)
-            .setInterpolator(OvershootInterpolator(1.5f)).start()
+        snackbarLayout.scaleX = 0.94f; snackbarLayout.scaleY = 0.94f
+        snackbarLayout.animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f).setDuration(320)
+            .setInterpolator(OvershootInterpolator(1.4f)).start()
         snackbarRunnable?.let { snackbarLayout.removeCallbacks(it) }
         snackbarRunnable = Runnable {
             snackbarLayout.animate().alpha(0f).translationY(30f).setDuration(260)
                 .setInterpolator(DecelerateInterpolator())
                 .withEndAction { snackbarLayout.visibility = View.GONE; snackbarLayout.translationY = 0f }.start()
         }
-        snackbarLayout.postDelayed(snackbarRunnable!!, 4000)
-        snackbarLayout.setOnClickListener {
-            snackbarRunnable?.let { r -> snackbarLayout.removeCallbacks(r) }
-            snackbarLayout.visibility = View.GONE; snackbarLayout.setOnClickListener(null)
-            onUndo()
+        snackbarLayout.postDelayed(snackbarRunnable!!, durationMs)
+        if (onUndo == null) {
+            snackbarLayout.setOnClickListener(null)
+        } else {
+            snackbarLayout.setOnClickListener {
+                snackbarRunnable?.let { r -> snackbarLayout.removeCallbacks(r) }
+                snackbarLayout.setOnClickListener(null)
+                snackbarLayout.animate().alpha(0f).setDuration(160)
+                    .withEndAction { snackbarLayout.visibility = View.GONE }.start()
+                vibrate(30)
+                onUndo()
+            }
         }
     }
 
@@ -715,6 +842,29 @@ class MainActivity : AppCompatActivity() {
         val editTime         = dialogView.findViewById<EditText>(R.id.editTime)
         val btnOk            = dialogView.findViewById<Button>(R.id.btnOk)
         val btnClose         = dialogView.findViewById<ImageButton>(R.id.btnClose)
+        val repeatNone       = dialogView.findViewById<TextView>(R.id.repeatNone)
+        val repeatDaily      = dialogView.findViewById<TextView>(R.id.repeatDaily)
+        val repeatWeekly     = dialogView.findViewById<TextView>(R.id.repeatWeekly)
+        val btnRemoveReminder= dialogView.findViewById<TextView>(R.id.btnRemoveReminder)
+
+        var repeatDays = if (todo.isRecurring) todo.recurringDays else 0
+        fun renderRepeat() {
+            listOf(repeatNone to 0, repeatDaily to 1, repeatWeekly to 7).forEach { (v, d) ->
+                val selected = d == repeatDays
+                v.setBackgroundResource(if (selected) R.drawable.repeat_chip_bg_selected else R.drawable.repeat_chip_bg)
+                v.setTextColor(if (selected) Color.parseColor("#CCFF00") else Color.WHITE)
+            }
+        }
+        renderRepeat()
+        listOf(repeatNone to 0, repeatDaily to 1, repeatWeekly to 7).forEach { (v, d) ->
+            v.setOnClickListener {
+                repeatDays = d; renderRepeat()
+                v.animate().scaleX(0.92f).scaleY(0.92f).setDuration(80).withEndAction {
+                    v.animate().scaleX(1f).scaleY(1f).setDuration(160).setInterpolator(OvershootInterpolator(2.5f)).start()
+                }.start()
+            }
+        }
+        btnRemoveReminder.visibility = if (todo.reminderTime != null) View.VISIBLE else View.GONE
 
         tvTodoText.text = if (todo.isPriority && todo.text.startsWith("!"))
             todo.text.removePrefix("!").trimStart() else todo.text
@@ -737,10 +887,22 @@ class MainActivity : AppCompatActivity() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         fun setReminder(timeMs: Long) {
-            todo.reminderTime = timeMs; saveTodos()
+            AlarmScheduler.cancelAlarm(this, todo)
+            todo.reminderTime = timeMs
+            todo.isRecurring = repeatDays > 0
+            todo.recurringDays = repeatDays
             AlarmScheduler.scheduleAlarm(this, todo)
-            adapter.notifyDataSetChanged()
-            showSnackbar("⏰ ${sdf.format(Date(timeMs))}")
+            sortTodos(); adapter.refresh(); saveTodos()
+            val repeat = AlarmScheduler.repeatLabel(todo)
+            showSnackbar("⏰ ${sdf.format(Date(timeMs))}" + (if (repeat != null) " · 🔁 $repeat" else ""))
+            dialog.dismiss()
+        }
+
+        btnRemoveReminder.setOnClickListener {
+            AlarmScheduler.cancelAlarm(this, todo)
+            todo.reminderTime = null; todo.isRecurring = false; todo.recurringDays = 0
+            sortTodos(); adapter.refresh(); saveTodos()
+            showSnackbar("🔕 Erinnerung entfernt")
             dialog.dismiss()
         }
 
@@ -786,6 +948,15 @@ class MainActivity : AppCompatActivity() {
         val switchNotifications = dialogView.findViewById<Switch>(R.id.switchNotifications)
         val switchDailySummary  = dialogView.findViewById<Switch>(R.id.switchDailySummary)
         val btnClose            = dialogView.findViewById<ImageButton>(R.id.btnClose)
+        val switchLargeText     = dialogView.findViewById<Switch>(R.id.switchLargeText)
+
+        switchLargeText.isChecked = TodoStorage.isLargeText(this)
+        switchLargeText.setOnCheckedChangeListener { _, c ->
+            TodoStorage.setLargeText(this, c)
+            adapter.largeText = c
+            adapter.refresh()
+            editInput.textSize = if (c) 20f else 17f
+        }
 
         switchCompliments.isChecked   = TodoStorage.isComplimentsEnabled(this)
         switchKonfetti.isChecked      = TodoStorage.isKonfettiEnabled(this)

@@ -30,6 +30,7 @@ object TodoStorage {
     private const val KEY_DAY_PREFIX = "day_"
     // Tagesziel-Erfolge: Key = "goal_reached_YYYY-MM-DD"
     private const val KEY_GOAL_REACHED_PREFIX = "goal_reached_"
+    private const val KEY_LARGE_TEXT = "large_text"
 
     private val gson = Gson()
 
@@ -130,6 +131,35 @@ object TodoStorage {
         } else {
             0
         }
+    }
+
+    /** Macht ein versehentliches "Erledigt" in der Statistik wieder rückgängig */
+    fun undoTodoCompleted(context: Context) {
+        val prefs = getPrefs(context)
+        val today = getTodayString()
+        val lastDate = prefs.getString(KEY_COMPLETED_TODAY_DATE, "") ?: ""
+        val editor = prefs.edit()
+        if (lastDate == today) {
+            val newToday = maxOf(prefs.getInt(KEY_COMPLETED_TODAY, 0) - 1, 0)
+            editor.putInt(KEY_COMPLETED_TODAY, newToday)
+            editor.putInt("$KEY_DAY_PREFIX${getFullTodayString()}", newToday)
+        }
+        editor.putInt(KEY_TOTAL_COMPLETED, maxOf(prefs.getInt(KEY_TOTAL_COMPLETED, 0) - 1, 0))
+        editor.apply()
+    }
+
+    fun isLargeText(context: Context): Boolean =
+        getPrefs(context).getBoolean(KEY_LARGE_TEXT, false)
+
+    fun setLargeText(context: Context, enabled: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_LARGE_TEXT, enabled).apply()
+    }
+
+    /** Ein einzelnes Todo in der gespeicherten Liste aktualisieren (z.B. aus Receivern) */
+    fun updateTodo(context: Context, updated: TodoItem) {
+        val todos = loadTodos(context)
+        val idx = todos.indexOfFirst { it.id == updated.id }
+        if (idx >= 0) { todos[idx] = updated; saveTodos(context, todos) }
     }
 
     fun getTotalCompleted(context: Context): Int {

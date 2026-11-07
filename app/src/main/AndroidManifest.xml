@@ -84,6 +84,7 @@
             android:enabled="true">
             <intent-filter>
                 <action android:name="com.todopro.app.ACTION_COMPLETE_TODO" />
+                <action android:name="com.todopro.app.ACTION_SNOOZE_TODO" />
             </intent-filter>
         </receiver>
 
