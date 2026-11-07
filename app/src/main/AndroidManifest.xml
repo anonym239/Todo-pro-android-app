@@ -12,8 +12,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Internet für Update-Check -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- APK-Installation -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Haptic Feedback -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -131,16 +129,6 @@
                 android:resource="@xml/widget_large_info" />
         </receiver>
 
-        <!-- FileProvider für APK-Installation -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
 
     </application>
 

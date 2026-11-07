@@ -50,13 +50,29 @@ jobs:
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" app/build.gradle
           echo "Building version: $VERSION_CLEAN (code: ${{ github.run_number }})"
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      - name: Signatur-Schluessel bereitstellen
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.p12"
+            echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release.p12" >> $GITHUB_ENV
+            echo "Fester Release-Schluessel wird verwendet."
+          else
+            echo "::warning::Keine Signatur-Secrets gefunden - APK wird mit Debug-Schluessel signiert."
+          fi
+
+      - name: Build Release APK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease
 
       - name: Rename APK
         run: |
           VERSION="${{ steps.get_version.outputs.VERSION }}"
-          cp app/build/outputs/apk/debug/app-debug.apk TodoPro-${VERSION}.apk
+          cp app/build/outputs/apk/release/app-release.apk TodoPro-${VERSION}.apk
 
       - name: Upload APK as Artifact
         uses: actions/upload-artifact@v4
@@ -82,6 +98,7 @@ jobs:
             1. **APK herunterladen** (Datei unten)
             2. Auf Android-Handy übertragen
             3. Installieren (**Unbekannte Quellen** muss erlaubt sein)
+               Falls Play Protect warnt: **Details → Trotzdem installieren**
             4. Beim ersten Start: Exakte Alarme erlauben
 
             ### ✨ Neu in dieser Version:

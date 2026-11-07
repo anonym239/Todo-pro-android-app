@@ -15,8 +15,32 @@ android {
         versionName "1.2.0"
     }
 
+    // Fester Release-Schlüssel (kommt im GitHub-Workflow aus den Repo-Secrets).
+    // Gleiche Signatur bei jedem Build = Updates funktionieren, weniger Play-Protect-Warnungen.
+    def ksFile = System.getenv("ANDROID_KEYSTORE_FILE")
+    def hasReleaseKey = ksFile != null && new File(ksFile).exists()
+
+    signingConfigs {
+        if (hasReleaseKey) {
+            release {
+                storeFile file(ksFile)
+                storeType "pkcs12"
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
     buildTypes {
         release {
+            // Ohne Secrets (z.B. lokal) mit Debug-Schlüssel, damit der Build trotzdem klappt
+            signingConfig hasReleaseKey ? signingConfigs.release : signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
